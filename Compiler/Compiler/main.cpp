@@ -11,15 +11,8 @@
 
 int main(int argc, const char * argv[]) {
     // insert code here...
-    auto id = Lex::satParser([](char c)->bool
-                                {
-                                   return isalpha(c);
-                                });
-    auto x = id("heee d");
-    std::cout << x->value().second <<std::endl;
-    
     Lex::ParserType<std::string>::Parser helloParser = Lex::strParser("hello");
     auto r = helloParser("hellow world");
-    std::cout << r->value().second << std::endl;
+    std::cout << r->value() << std::endl;
     return 0;
 }
