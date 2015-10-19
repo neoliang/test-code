@@ -14,6 +14,7 @@
 #include <memory>
 #include <string>
 #include <functional>
+#include <list>
 namespace Lex {
     template<typename T>
     class LexResult
@@ -74,6 +75,8 @@ namespace Lex {
             };
         }
     };
+    
+    //same as regular expression cocatnation but more powerfull
     template<typename T1,typename T2>
     inline typename ParserType<T2>::Parser Bind(typename ParserType<T1>::Parser x,std::function<typename ParserType<T2>::Parser(T1)> y)
     {
@@ -90,10 +93,52 @@ namespace Lex {
         };
     }
     
+    //regular expression Choice
+    template<typename T>
+    inline typename ParserType<T>::Parser Choice(typename ParserType<T>::Parser x,typename ParserType<T>::Parser y)
+    {
+        return [x,y](const std::string& inp)->typename ParserType<T>::Result{
+            auto r = x(inp);
+            if (!r->isNone()) {
+                return r;
+            }
+            else
+            {
+                return y(inp);
+            }
+        };
+    }
+    
+    //regular expression +
+    template<typename T>
+    typename ParserType<std::list<T>>::Parser Many1(typename ParserType<T>::Parser f);
+    
+    //regular expression *
+    template<typename T>
+    inline typename ParserType<std::list<T>>::Parser Many(typename ParserType<T>::Parser f)
+    {
+        return Choice<std::list<T>>(Many1<T>(f), ParserType<std::list<T>>::ret(std::list<T>()));
+    }
+    
+    template<typename T>
+    inline typename ParserType<std::list<T>>::Parser Many1(typename ParserType<T>::Parser f)
+    {
+        return Bind<T, std::list<T>>(f,[f](T v){
+            return Bind<std::list<T>, std::list<T>>(Many<T>(f), [v](std::list<T> vs)
+                                                        {
+                                                            vs.push_front (v);
+                                                            return ParserType<std::list<T>>::ret(vs);
+                                                        });
+        });
+        
+    }
+    
+    
     ParserType<char>::Result item(const std::string& inp);
     ParserType<char>::Parser satParser(std::function<bool(char)> f);
     ParserType<char>::Parser charParser(char c);
     ParserType<std::string>::Parser charsParser(char c);
     ParserType<std::string>::Parser strParser(const std::string& str);
+    extern ParserType<std::list<char>>::Parser digitsParser;
 }
 #endif /* defined(__Compiler__Lex__) */

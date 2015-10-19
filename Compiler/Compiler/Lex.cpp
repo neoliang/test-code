@@ -9,6 +9,9 @@
 #include "Lex.h"
 namespace Lex{
     
+    ParserType<std::list<char>>::Parser digitsParser = Many1<char>(satParser([](char c){
+            return isnumber(c);
+        }));
     ParserType<char>::Result item(const std::string& inp)
     {
         if (inp.empty()) {
