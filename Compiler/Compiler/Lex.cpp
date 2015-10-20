@@ -12,14 +12,14 @@ namespace Lex{
     ParserType<std::list<char>>::Parser digitsParser = Many1<char>(satParser([](char c){
             return isnumber(c);
         }));
-    ParserType<char>::Result item(const std::string& inp)
+    ParserType<char>::Result item(const  ParserStream& inp)
     {
         if (inp.empty()) {
             return LexResult<char>::None();
         }
         else
         {
-            return LexResult<char>::Some(inp.front(), inp.substr(1));
+            return LexResult<char>::Some(inp.get(), inp.next());
         }
     }
     
@@ -34,8 +34,7 @@ namespace Lex{
                 return ParserType<char>::failure();
             }
         };
-        auto x = Bind<char,char>(item, funx);
-        return x;
+        return Bind<char,char>(item, funx);
     }
     
     ParserType<char>::Parser charParser(char c)
@@ -45,7 +44,7 @@ namespace Lex{
     
     ParserType<std::string>::Parser charsParser(char c)
     {
-        return [c](const std::string& inp)->typename ParserType<std::string>::Result{
+        return [c](const ParserStream& inp)->typename ParserType<std::string>::Result{
             auto r = (charParser(c))(inp);
             if (r->isNone()) {
                 return LexResult<std::string>::None();

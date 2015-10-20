@@ -15,17 +15,20 @@
 #include <string>
 #include <functional>
 #include <list>
+#include "ParserStream.h"
 namespace Lex {
+    
+    
     template<typename T>
     class LexResult
     {
         T _value;
-        std::string _remain;
+        ParserStream _remain;
         bool _isNone = true;
     public:
         LexResult()
         {}
-        LexResult(const T& v,const std::string& r)
+        LexResult(const T& v,const ParserStream& r)
         :_value(v)
         ,_remain(r)
         ,_isNone(false)
@@ -39,13 +42,13 @@ namespace Lex {
             }
             return _value;
         }
-        const std::string& remain()
+        const ParserStream& remain()
         {
             return _remain;
         }
         
     public:
-        static std::shared_ptr<LexResult<T>> Some(const T& v,const std::string& r)
+        static std::shared_ptr<LexResult<T>> Some(const T& v,const ParserStream& r)
         {
             return std::shared_ptr<LexResult<T>>(new LexResult<T>(v,r));
         }
@@ -59,17 +62,17 @@ namespace Lex {
     struct ParserType
     {
         typedef std::shared_ptr<LexResult<T>> Result;
-        typedef std::function<Result(const std::string&)> Parser;
+        typedef std::function<Result(const ParserStream&)> Parser;
         static Parser ret(T t)
         {
-            return [t](const std::string& inp)->Result
+            return [t](const ParserStream& inp)->Result
             {
                 return LexResult<T>::Some(t,inp);
             };
         }
         static Parser failure()
         {
-            return [](const std::string& inp)->Result
+            return [](const ParserStream& inp)->Result
             {
                 return LexResult<T>::None();
             };
@@ -80,7 +83,7 @@ namespace Lex {
     template<typename T1,typename T2>
     inline typename ParserType<T2>::Parser Bind(typename ParserType<T1>::Parser x,std::function<typename ParserType<T2>::Parser(T1)> y)
     {
-        return [x,y](const std::string& inp)->typename ParserType<T2>::Result{
+        return [x,y](const ParserStream& inp)->typename ParserType<T2>::Result{
             auto r = x(inp);
             if (r->isNone()) {
                 return LexResult<T2>::None();
@@ -97,7 +100,7 @@ namespace Lex {
     template<typename T>
     inline typename ParserType<T>::Parser Choice(typename ParserType<T>::Parser x,typename ParserType<T>::Parser y)
     {
-        return [x,y](const std::string& inp)->typename ParserType<T>::Result{
+        return [x,y](const ParserStream& inp)->typename ParserType<T>::Result{
             auto r = x(inp);
             if (!r->isNone()) {
                 return r;
@@ -134,7 +137,7 @@ namespace Lex {
     }
     
     
-    ParserType<char>::Result item(const std::string& inp);
+    ParserType<char>::Result item(const ParserStream& inp);
     ParserType<char>::Parser satParser(std::function<bool(char)> f);
     ParserType<char>::Parser charParser(char c);
     ParserType<std::string>::Parser charsParser(char c);
