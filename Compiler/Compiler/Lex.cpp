@@ -12,6 +12,9 @@ namespace Lex{
     ParserType<std::list<char>>::Parser digitsParser = Many1<char>(satParser([](char c){
             return isnumber(c);
         }));
+    ParserType<std::list<char>>::Parser idParser = Many1<char>(satParser([](char c){
+        return isalpha(c);
+    }));
     ParserType<char>::Result item(const  ParserStream& inp)
     {
         if (inp.empty()) {

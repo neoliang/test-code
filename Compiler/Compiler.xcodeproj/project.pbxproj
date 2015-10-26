@@ -10,17 +10,19 @@
 		CEEB5DE41BD22E610030FDFF /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CEEB5DE31BD22E610030FDFF /* main.cpp */; };
 		CEEB5DEC1BD22E7E0030FDFF /* Lex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CEEB5DEA1BD22E7E0030FDFF /* Lex.cpp */; };
 		CEF9C9021BD6516E00CC81C1 /* ParserStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CEF9C9001BD6516E00CC81C1 /* ParserStream.cpp */; };
+		CEF9C9081BDE2CCC00CC81C1 /* TinySyntax.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CEF9C9061BDE2CCC00CC81C1 /* TinySyntax.cpp */; };
+		CEF9C90B1BDE67A200CC81C1 /* TinyParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CEF9C9091BDE67A200CC81C1 /* TinyParser.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		CEEB5DDE1BD22E610030FDFF /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 12;
+			buildActionMask = 2147483647;
 			dstPath = /usr/share/man/man1/;
 			dstSubfolderSpec = 0;
 			files = (
 			);
-			runOnlyForDeploymentPostprocessing = 0;
+			runOnlyForDeploymentPostprocessing = 1;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
@@ -31,6 +33,10 @@
 		CEEB5DEB1BD22E7E0030FDFF /* Lex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Lex.h; sourceTree = "<group>"; };
 		CEF9C9001BD6516E00CC81C1 /* ParserStream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParserStream.cpp; sourceTree = "<group>"; };
 		CEF9C9011BD6516E00CC81C1 /* ParserStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParserStream.h; sourceTree = "<group>"; };
+		CEF9C9061BDE2CCC00CC81C1 /* TinySyntax.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TinySyntax.cpp; sourceTree = "<group>"; };
+		CEF9C9071BDE2CCC00CC81C1 /* TinySyntax.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TinySyntax.h; sourceTree = "<group>"; };
+		CEF9C9091BDE67A200CC81C1 /* TinyParser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TinyParser.cpp; sourceTree = "<group>"; };
+		CEF9C90A1BDE67A200CC81C1 /* TinyParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TinyParser.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -68,6 +74,10 @@
 				CEEB5DEB1BD22E7E0030FDFF /* Lex.h */,
 				CEF9C9001BD6516E00CC81C1 /* ParserStream.cpp */,
 				CEF9C9011BD6516E00CC81C1 /* ParserStream.h */,
+				CEF9C9061BDE2CCC00CC81C1 /* TinySyntax.cpp */,
+				CEF9C9071BDE2CCC00CC81C1 /* TinySyntax.h */,
+				CEF9C9091BDE67A200CC81C1 /* TinyParser.cpp */,
+				CEF9C90A1BDE67A200CC81C1 /* TinyParser.h */,
 			);
 			path = Compiler;
 			sourceTree = "<group>";
@@ -128,8 +138,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CEF9C90B1BDE67A200CC81C1 /* TinyParser.cpp in Sources */,
 				CEEB5DE41BD22E610030FDFF /* main.cpp in Sources */,
 				CEF9C9021BD6516E00CC81C1 /* ParserStream.cpp in Sources */,
+				CEF9C9081BDE2CCC00CC81C1 /* TinySyntax.cpp in Sources */,
 				CEEB5DEC1BD22E7E0030FDFF /* Lex.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

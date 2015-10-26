@@ -143,5 +143,6 @@ namespace Lex {
     ParserType<std::string>::Parser charsParser(char c);
     ParserType<std::string>::Parser strParser(const std::string& str);
     extern ParserType<std::list<char>>::Parser digitsParser;
+    extern ParserType<std::list<char>>::Parser idParser;
 }
 #endif /* defined(__Compiler__Lex__) */
