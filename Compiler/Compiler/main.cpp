@@ -25,7 +25,7 @@ int main(int argc, const char * argv[]) {
     Lex::ParserType<std::string>::Parser helloParser = Lex::strParser("hello");
     auto r = helloParser(s);
     std::cout << r->value() << std::endl;
-    auto digits = Lex::digitsParser(Lex::ParserStream::fromString("112345 xxxx"));
+    auto digits = Lex::digitsParser(Lex::ParserStream::fromFile("/tmp/test.txt"));
     auto l = digits->value();
     std::string x(l.begin(),l.end());
     std::cout << x << std::endl;
