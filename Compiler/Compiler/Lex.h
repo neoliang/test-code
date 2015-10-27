@@ -96,6 +96,19 @@ namespace Lex {
         };
     }
     
+    template<typename T>
+    inline typename ParserType<T>::Parser ChooseN(const std::list<typename ParserType<T>::Parser>& ps)
+    {
+        return [ps](const ParserStream& inp)->typename ParserType<T>::Result{
+            for (auto iter = ps.begin(); iter != ps.end(); ++iter) {
+                auto r = (*iter)(inp);
+                if (!r->isNone()) {
+                    return r;
+                }
+            }
+            return LexResult<T>::None();
+        };
+    }
     //regular expression Choice
     template<typename T>
     inline typename ParserType<T>::Parser Choice(typename ParserType<T>::Parser x,typename ParserType<T>::Parser y)

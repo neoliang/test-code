@@ -10,6 +10,7 @@
 #include "Lex.h"
 #include <fstream>
 #include <sstream>
+#include "TinyParser.h"
 int main(int argc, const char * argv[]) {
 //    std::istringstream iss("hello word");
 //    std::istream_iterator<char> issi(iss);
@@ -21,13 +22,17 @@ int main(int argc, const char * argv[]) {
 //    }
 //    std::cout << std::endl;
     // insert code here..
-    Lex::ParserStream s = Lex::ParserStream::fromString("hellow world");
-    Lex::ParserType<std::string>::Parser helloParser = Lex::strParser("hello");
-    auto r = helloParser(s);
-    std::cout << r->value() << std::endl;
-    auto digits = Lex::digitsParser(Lex::ParserStream::fromString("112345 xxxx"));
-    auto l = digits->value();
-    std::string x(l.begin(),l.end());
-    std::cout << x << std::endl;
+//    Lex::ParserStream s = Lex::ParserStream::fromString("hellow world");
+//    Lex::ParserType<std::string>::Parser helloParser = Lex::strParser("hello");
+//    auto r = helloParser(s);
+//    std::cout << r->value() << std::endl;
+//    auto digits = Lex::digitsParser(Lex::ParserStream::fromString("90+23*55 xxxx"));
+//    auto l = digits->value();
+//    std::string x(l.begin(),l.end());
+//    std::cout << x << std::endl;
+    
+    auto stream = Lex::ParserStream::fromString("23");
+    auto exp = Parser::Exp(stream);
+    
     return 0;
 }

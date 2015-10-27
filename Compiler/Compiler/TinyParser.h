@@ -14,8 +14,8 @@
 #include <memory>
 namespace Parser {
    
-
-
+    
+    ExpNodePtr Exp(const Lex::ParserStream& inp);
 }
 
 #endif /* defined(__Compiler__TinyParser__) */

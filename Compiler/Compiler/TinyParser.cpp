@@ -8,14 +8,24 @@
 
 #include "TinyParser.h"
 #include <sstream>
+#include <iostream>
 namespace Parser
 {
-     typedef std::shared_ptr<ExpNode> ExpNodePtr;
+    
     Lex::ParserType<ExpNodePtr>::Result ParserExp(const Lex::ParserStream& inp);
     Lex::ParserType<ExpNodePtr>::Result ParserSimpleExp(const Lex::ParserStream& inp);
     Lex::ParserType<ExpNodePtr>::Result ParserTerm(const Lex::ParserStream& inp);
     Lex::ParserType<ExpNodePtr>::Result ParserFactor(const Lex::ParserStream& inp);
     
+    
+    ExpNodePtr Exp(const Lex::ParserStream& inp)
+    {
+        auto r = ParserExp(inp);
+        if (r->isNone()) {
+            return nullptr;
+        }
+        return r->value();
+    }
     Lex::ParserType<ExpNodePtr>::Result ParserConst(const Lex::ParserStream& inp)
     {
         auto dig = Lex::digitsParser(inp);
@@ -24,11 +34,13 @@ namespace Parser
         }
         else
         {
-            auto v = std::string(dig->value().begin(),dig->value().end());
             std::stringstream ss;
-            ss >> v;
-            int vi ;
-            ss << vi;
+            std::cout << dig->value().size() << std::endl;
+            for (std::list<char>::const_iterator iter  = dig->value().begin();iter != dig->value().end();++iter)
+            {
+                std::cout << *iter << std::endl;
+            }
+            int vi =0;
             return Lex::LexResult<ExpNodePtr>::Some(ExpNodePtr(new ConstExp(dig->remain().lineNum(),vi)), dig->remain());
         }
     }
@@ -47,7 +59,23 @@ namespace Parser
     
     Lex::ParserType<ExpNodePtr>::Result ParserFactor(const Lex::ParserStream& inp)
     {
-        return Lex::Choice<ExpNodePtr>(ParserIdentifier,ParserConst) (inp);
+        auto lexp = Lex::Bind<char, ExpNodePtr>(Lex::satParser([](char c){return c== '(';}), [](char )->typename Lex::ParserType<ExpNodePtr>::Parser{
+                return ParserExp;
+        });
+        auto fexp = Lex::Bind<ExpNodePtr, ExpNodePtr>(lexp, [](ExpNodePtr exp)->typename Lex::ParserType<ExpNodePtr>::Parser{
+            return [exp](const Lex::ParserStream& inp)->typename Lex::ParserType<ExpNodePtr>::Result
+            {
+                auto rexp = Lex::satParser([](char c){return c== '(';})(inp);
+                if (rexp->isNone()) {
+                    return Lex::LexResult<ExpNodePtr>::None();
+                }
+                else
+                {
+                    return Lex::LexResult<ExpNodePtr>::Some(exp, rexp->remain());
+                }
+            };
+        });
+        return Lex::ChooseN<ExpNodePtr>({ParserConst,ParserIdentifier,fexp}) (inp);
     }
     Lex::ParserType<ExpNodePtr>::Result ParserTerm(const Lex::ParserStream& inp)
     {
@@ -68,32 +96,32 @@ namespace Parser
         };
         auto mulExpPaser = Lex::Bind<char, std::pair<char, ExpNodePtr>>(mulOpParser,bMulOpExp);
         
-        auto bMulExp =[mulExpPaser](ExpNodePtr exp)-> typename Lex::ParserType<std::pair<char, ExpNodePtr>>::Parser
+        auto bMulExp =[mulExpPaser](ExpNodePtr exp)-> typename Lex::ParserType<ExpNodePtr>::Parser
         {
-            return [mulExpPaser,exp](const Lex::ParserStream& inp)->typename Lex::ParserType<std::pair<char, ExpNodePtr>>::Result
+            return [mulExpPaser,exp](const Lex::ParserStream& inp)->typename Lex::ParserType<ExpNodePtr>::Result
             {
                 auto comparisonR = mulExpPaser(inp);
                 if (comparisonR->isNone()) {
-                    return Lex::LexResult<std::pair<char, ExpNodePtr>>::None();
+                    return Lex::LexResult<ExpNodePtr>::Some(exp, inp);
                 }
                 else
                 {
                     std::string op ;
                     op.push_back(comparisonR->value().first);
                     ExpNodePtr newExp = ExpNodePtr(new UnaryOpExp(comparisonR->remain().lineNum(),op, exp,comparisonR->value().second));
-                    return Lex::LexResult<std::pair<char, ExpNodePtr>>::Some(std::make_pair(op.front(), newExp), comparisonR->remain());
+                    return Lex::LexResult<ExpNodePtr>::Some(newExp, comparisonR->remain());
                 }
             };
             
         };
-        auto x = Lex::Bind<ExpNodePtr, std::pair<char, ExpNodePtr>>(ParserFactor,bMulExp);
+        auto x = Lex::Bind<ExpNodePtr, ExpNodePtr>(ParserFactor,bMulExp);
         auto y = x(inp);
         if (y->isNone()) {
             return Lex::LexResult<ExpNodePtr>::None();
         }
         else
         {
-            return Lex::LexResult<ExpNodePtr>::Some(y->value().second, y->remain());
+            return Lex::LexResult<ExpNodePtr>::Some(y->value(), y->remain());
         }
     }
     
@@ -116,32 +144,32 @@ namespace Parser
         };
         auto addExpPaser = Lex::Bind<char, std::pair<char, ExpNodePtr>>(addOpParser,bOpExp);
         
-        auto bAddExp =[addExpPaser](ExpNodePtr exp)-> typename Lex::ParserType<std::pair<char, ExpNodePtr>>::Parser
+        auto bAddExp =[addExpPaser](ExpNodePtr exp)-> typename Lex::ParserType<ExpNodePtr>::Parser
         {
-            return [addExpPaser,exp](const Lex::ParserStream& inp)->typename Lex::ParserType<std::pair<char, ExpNodePtr>>::Result
+            return [addExpPaser,exp](const Lex::ParserStream& inp)->typename Lex::ParserType<ExpNodePtr>::Result
             {
                 auto comparisonR = addExpPaser(inp);
                 if (comparisonR->isNone()) {
-                    return Lex::LexResult<std::pair<char, ExpNodePtr>>::None();
+                    return Lex::LexResult<ExpNodePtr>::Some(exp, inp);
                 }
                 else
                 {
                     std::string op ;
                     op.push_back(comparisonR->value().first);
                     ExpNodePtr newExp = ExpNodePtr(new UnaryOpExp(comparisonR->remain().lineNum(),op, exp,comparisonR->value().second));
-                    return Lex::LexResult<std::pair<char, ExpNodePtr>>::Some(std::make_pair(op.front(), newExp), comparisonR->remain());
+                    return Lex::LexResult<ExpNodePtr>::Some(newExp, comparisonR->remain());
                 }
             };
             
         };
-        auto x = Lex::Bind<ExpNodePtr, std::pair<char, ExpNodePtr>>(ParserTerm,bAddExp);
+        auto x = Lex::Bind<ExpNodePtr, ExpNodePtr>(ParserTerm,bAddExp);
         auto y = x(inp);
         if (y->isNone()) {
             return Lex::LexResult<ExpNodePtr>::None();
         }
         else
         {
-            return Lex::LexResult<ExpNodePtr>::Some(y->value().second, y->remain());
+            return Lex::LexResult<ExpNodePtr>::Some(y->value(), y->remain());
         }
     }
     
@@ -163,32 +191,32 @@ namespace Parser
             };
         };
         auto comparisonExp = Lex::Bind<char, std::pair<char, ExpNodePtr>>(comparisonParser,comparExp);
-        auto bComparsionExp =[comparisonExp](ExpNodePtr exp)-> typename Lex::ParserType<std::pair<char, ExpNodePtr>>::Parser
+        auto bComparsionExp =[comparisonExp](ExpNodePtr exp)-> typename Lex::ParserType<ExpNodePtr>::Parser
         {
-            return [comparisonExp,exp](const Lex::ParserStream& inp)->typename Lex::ParserType<std::pair<char, ExpNodePtr>>::Result
+            return [comparisonExp,exp](const Lex::ParserStream& inp)->typename Lex::ParserType<ExpNodePtr>::Result
             {
                 auto comparisonR = comparisonExp(inp);
                 if (comparisonR->isNone()) {
-                    return Lex::LexResult<std::pair<char, ExpNodePtr>>::None();
+                    return Lex::LexResult<ExpNodePtr>::Some(exp, inp);
                 }
                 else
                 {
                     std::string op ;
                     op.push_back(comparisonR->value().first);
                     ExpNodePtr newExp = ExpNodePtr(new UnaryOpExp(comparisonR->remain().lineNum(),op, exp,comparisonR->value().second));
-                    return Lex::LexResult<std::pair<char, ExpNodePtr>>::Some(std::make_pair(op.front(), newExp), comparisonR->remain());
+                    return Lex::LexResult<ExpNodePtr>::Some(newExp, comparisonR->remain());
                 }
             };
             
         };
-        auto x = Lex::Bind<ExpNodePtr, std::pair<char, ExpNodePtr>>(ParserSimpleExp,bComparsionExp);
+        auto x = Lex::Bind<ExpNodePtr, ExpNodePtr>(ParserSimpleExp,bComparsionExp);
         auto y = x(inp);
         if (y->isNone()) {
             return Lex::LexResult<ExpNodePtr>::None();
         }
         else
         {
-            return Lex::LexResult<ExpNodePtr>::Some(y->value().second, y->remain());
+            return Lex::LexResult<ExpNodePtr>::Some(y->value(), y->remain());
         }
     
     }
