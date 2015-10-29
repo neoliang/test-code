@@ -24,6 +24,9 @@ namespace Lex {
         
         void moveToNext()
         {
+            if (empty()) {
+                throw std::bad_exception();
+            }
             ++iter;
             if (*iter == '\n') {
                 ++_lineNum;
@@ -36,6 +39,7 @@ namespace Lex {
         }
         ParserStream(std::istream* stream)
         {
+            stream->unsetf(std::ios::skipws);
             _stream = std::shared_ptr<std::istream>(stream);
             iter = std::istream_iterator<char>(*stream);
         }
@@ -64,6 +68,9 @@ namespace Lex {
         }
         char get()const
         {
+            if (empty()) {
+                throw std::bad_exception();
+            }
             return *iter;
         }
         unsigned int lineNum()const

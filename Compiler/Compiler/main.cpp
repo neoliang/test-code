@@ -33,6 +33,7 @@ int main(int argc, const char * argv[]) {
     
     auto stream = Lex::ParserStream::fromString("23");
     auto exp = Parser::Exp(stream);
-    
+    std::istream_iterator<char> 
+    std::istringstream ss = std::stringstream("hellll aaaa");
     return 0;
 }
