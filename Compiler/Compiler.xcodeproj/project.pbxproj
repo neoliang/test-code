@@ -47,6 +47,7 @@
 		CEEB5DE31BD22E610030FDFF /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		CEEB5DEA1BD22E7E0030FDFF /* Lex.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Lex.cpp; sourceTree = "<group>"; };
 		CEEB5DEB1BD22E7E0030FDFF /* Lex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Lex.h; sourceTree = "<group>"; };
+		CEED21601BE36D490063A4AB /* TestTinyParser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TestTinyParser.h; sourceTree = "<group>"; };
 		CEF9C9001BD6516E00CC81C1 /* ParserStream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParserStream.cpp; sourceTree = "<group>"; };
 		CEF9C9011BD6516E00CC81C1 /* ParserStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParserStream.h; sourceTree = "<group>"; };
 		CEF9C9061BDE2CCC00CC81C1 /* TinySyntax.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TinySyntax.cpp; sourceTree = "<group>"; };
@@ -242,6 +243,7 @@
 				CEF9C9361BE0B36000CC81C1 /* Catch.h */,
 				CEF9C9371BE0B36000CC81C1 /* main.cpp */,
 				CEF9C9381BE0B36000CC81C1 /* TestLex.cpp */,
+				CEED21601BE36D490063A4AB /* TestTinyParser.h */,
 			);
 			path = Test;
 			sourceTree = "<group>";

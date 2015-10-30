@@ -8,6 +8,7 @@
 
 #include "Lex.h"
 #include "rapidcheck.h"
+#include <sstream>
 using namespace std;
 using namespace Lex;
 
@@ -72,22 +73,15 @@ void TestLex()
         RC_ASSERT(r->value() == str);
         RC_ASSERT(r->remain().empty());
     });
+    
+    //digit
+    rc::check("digits",[](const unsigned int& number){
+        stringstream ss;
+        ss << number;
+        auto stream = ParserStream::fromString(ss.str());
+        auto r = digitsParser(stream);
+        std::string str(r->value().begin(),r->value().end());
+        RC_ASSERT(str == ss.str());
+    });
 }
 
-
-//TEST_CASE( "[lex]", "[lex]" ) {
-//    SECTION("normal")
-//    {
-//        auto stream = Lex::ParserStream::fromString("hellow word");
-//        auto itemResult = item(stream);
-//        REQUIRE(itemResult->value() == 'h');
-//        REQUIRE(itemResult->remain().get() == 'e');
-//    }
-//    SECTION("empty and 1"){
-//        auto r = item(ParserStream::fromString(""));
-//        REQUIRE(r->isNone());
-//        auto r1 = item(ParserStream::fromString("1"));
-//        REQUIRE(r1->value() == '1');
-//        REQUIRE(r1->remain().empty());
-//    }
-//}

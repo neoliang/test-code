@@ -11,13 +11,14 @@
 
 #include <fstream>
 #include <iostream>
+#include "Lex.h"
+#include "TestTinyParser.h"
 using namespace std;
-
+using namespace Lex;
 
 void TestLex();
 int main() {
-    
-    
     TestLex();
+    TestTinyParser();
     return 0;
 }

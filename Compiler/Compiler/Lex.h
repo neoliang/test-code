@@ -36,7 +36,7 @@ namespace Lex {
         ~LexResult(){}
     public:
         bool isNone(){return _isNone;}
-        T value(){
+        const T& value(){
             if (isNone()) {
                 throw std::bad_exception();
             }
