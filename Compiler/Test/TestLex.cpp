@@ -42,6 +42,36 @@ void TestLex()
             RC_ASSERT(*str.begin() == itemResult->value());
         }
     });
+    
+    //sat
+    rc::check("sat & char & chars",[](const char& c){
+        auto str = std::string();
+        str.push_back(c);
+        auto stream = Lex::ParserStream::fromString(str);
+        auto p = satParser([c](char x)->bool{return c == x;});
+        auto r = p(stream);
+        RC_ASSERT(r->value() == c);
+        RC_ASSERT(r->remain().empty());
+        p = charParser(c);
+        r = p(stream);
+        RC_ASSERT(r->value() == c);
+        RC_ASSERT(r->remain().empty());
+        auto ps = charsParser(c);
+        auto rs = ps(stream);
+        RC_ASSERT(rs->value().front() == c);
+        RC_ASSERT(rs->value().size() == 1);
+        RC_ASSERT(r->remain().empty());
+        
+    });
+    
+    //str
+    rc::check("string",[](const std::string& str){
+        auto stream = Lex::ParserStream::fromString(str);
+        auto sp = Lex::strParser(str);
+        auto r = sp(stream);
+        RC_ASSERT(r->value() == str);
+        RC_ASSERT(r->remain().empty());
+    });
 }
 
 

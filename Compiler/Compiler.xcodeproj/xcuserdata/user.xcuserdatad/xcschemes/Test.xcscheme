@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "CEF9C9281BE0B33100CC81C1"
-               BuildableName = "Compiler copy"
+               BuildableName = "Test"
                BlueprintName = "Test"
                ReferencedContainer = "container:Compiler.xcodeproj">
             </BuildableReference>
@@ -33,7 +33,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "CEF9C9281BE0B33100CC81C1"
-            BuildableName = "Compiler copy"
+            BuildableName = "Test"
             BlueprintName = "Test"
             ReferencedContainer = "container:Compiler.xcodeproj">
          </BuildableReference>
@@ -53,7 +53,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "CEF9C9281BE0B33100CC81C1"
-            BuildableName = "Compiler copy"
+            BuildableName = "Test"
             BlueprintName = "Test"
             ReferencedContainer = "container:Compiler.xcodeproj">
          </BuildableReference>
@@ -72,7 +72,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "CEF9C9281BE0B33100CC81C1"
-            BuildableName = "Compiler copy"
+            BuildableName = "Test"
             BlueprintName = "Test"
             ReferencedContainer = "container:Compiler.xcodeproj">
          </BuildableReference>
