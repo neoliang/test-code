@@ -193,7 +193,8 @@ namespace Parser {
         virtual void Accept(const SyntaxNode& node) {};
     };
     
-     typedef std::shared_ptr<ExpNode> ExpNodePtr;
+    typedef std::shared_ptr<ExpNode> ExpNodePtr;
+    typedef std::shared_ptr<StatementSeq> StatementSeqPtr;
 }
 
 
