@@ -12,11 +12,42 @@
 namespace Parser
 {
     
-    Lex::ParserType<ExpNodePtr>::Result ParserExp(const Lex::ParserStream& inp);
-    Lex::ParserType<ExpNodePtr>::Result ParserSimpleExp(const Lex::ParserStream& inp);
-    Lex::ParserType<ExpNodePtr>::Result ParserTerm(const Lex::ParserStream& inp);
-    Lex::ParserType<ExpNodePtr>::Result ParserFactor(const Lex::ParserStream& inp);
+    Lex::ParserType<ReadStatementPtr>::Result ParserRead(const Lex::ParserStream& inp)
+    {
+        auto _paser = Lex::Bind<std::string, ReadStatementPtr>(Lex::Token<std::string>(Lex::strParser("read")), [](const std::string&)->typename Lex::ParserType<ReadStatementPtr>::Parser{
+            return [](const Lex::ParserStream& inp)->typename Lex::ParserType<ReadStatementPtr>::Result{
+                auto id = Lex::idParser(inp);
+                if (id->isNone()) {
+                    return Lex::LexResult<ReadStatementPtr>::None();
+                }
+                else
+                {
+                    std::string idstr = std::string(id->value().begin(),id->value().end());
+                    auto readState =  ReadStatementPtr(new ReadStatement(id->remain().lineNum(),idstr));
+                    return Lex::LexResult<ReadStatementPtr>::Some(readState, id->remain());
+                }
+            };
+        });
+        return _paser(inp);
+    }
     
+    Lex::ParserType<WriteStatementPtr>::Result ParserWrite(const Lex::ParserStream& inp)
+    {
+        auto _paser = Lex::Bind<std::string, WriteStatementPtr>(Lex::Token<std::string>(Lex::strParser("write")), [](const std::string&)->typename Lex::ParserType<WriteStatementPtr>::Parser{
+            return [](const Lex::ParserStream& inp)->typename Lex::ParserType<WriteStatementPtr>::Result{
+                auto id = ParserExp(inp);
+                if (id->isNone()) {
+                    return Lex::LexResult<WriteStatementPtr>::None();
+                }
+                else
+                {
+                    auto writeState =  WriteStatementPtr(new WriteStatement(id->remain().lineNum(),id->value()));
+                    return Lex::LexResult<WriteStatementPtr>::Some(writeState, id->remain());
+                }
+            };
+        });
+        return _paser(inp);
+    }
     
     ExpNodePtr Exp(const Lex::ParserStream& inp)
     {
@@ -57,30 +88,14 @@ namespace Parser
         }
     }
     
-    using namespace Lex;
-    //same as regular expression cocatnation but more powerfull
-    typename ParserType<ExpNodePtr>::Parser Bindxx(typename ParserType<char>::Parser x,std::function<typename ParserType<ExpNodePtr>::Parser(char)> y)
-    {
-        return [x,y](const ParserStream& inp)->typename ParserType<ExpNodePtr>::Result{
-            auto r = x(inp);
-            if (r->isNone()) {
-                return LexResult<ExpNodePtr>::None();
-            }
-            else
-            {
-                return (y(r->value()))(r->remain());
-            }
-            
-        };
-    }
     
     Lex::ParserType<ExpNodePtr>::Result ParserFactor(const Lex::ParserStream& inp)
     {
-        auto lexp = Bindxx(Lex::satParser([](char c){
-            return c== '(';
-        }), [](char )->typename Lex::ParserType<ExpNodePtr>::Parser{
-            return ParserExp;
-        });
+        auto lexp = Lex::Bind<char, ExpNodePtr>(Lex::satParser([](char c){return c== '(';}),
+            [](char )->typename Lex::ParserType<ExpNodePtr>::Parser{
+                return ParserExp;
+            }
+        );
         auto fexp = Lex::Bind<ExpNodePtr, ExpNodePtr>(lexp, [](ExpNodePtr exp)->typename Lex::ParserType<ExpNodePtr>::Parser{
             return [exp](const Lex::ParserStream& inp)->typename Lex::ParserType<ExpNodePtr>::Result
             {

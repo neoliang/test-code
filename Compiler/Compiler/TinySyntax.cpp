@@ -23,4 +23,14 @@ namespace Parser{
         
     }
     
+    void WriteStatement::Visit(std::shared_ptr<NodeVisitor> vi)
+    {
+        
+    }
+    
+    void ReadStatement::Visit(std::shared_ptr<NodeVisitor> vi)
+    {
+        
+    }
+    
 }

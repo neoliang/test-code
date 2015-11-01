@@ -20,10 +20,15 @@ namespace Parser {
     ExpNodePtr Exp(const Lex::ParserStream& inp);
     
     //helper
+    //exp
     Lex::ParserType<ExpNodePtr>::Result ParserExp(const Lex::ParserStream& inp);
     Lex::ParserType<ExpNodePtr>::Result ParserSimpleExp(const Lex::ParserStream& inp);
     Lex::ParserType<ExpNodePtr>::Result ParserTerm(const Lex::ParserStream& inp);
     Lex::ParserType<ExpNodePtr>::Result ParserFactor(const Lex::ParserStream& inp);
+    
+    //statement
+    Lex::ParserType<ReadStatementPtr>::Result ParserRead(const Lex::ParserStream& inp);
+    Lex::ParserType<WriteStatementPtr>::Result ParserWrite(const Lex::ParserStream& inp);
 }
 
 #endif /* defined(__Compiler__TinyParser__) */

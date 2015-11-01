@@ -80,8 +80,9 @@ namespace Lex {
     };
     
     //same as regular expression cocatnation but more powerfull
+    
     template<typename T1,typename T2>
-    inline typename ParserType<T2>::Parser Bind(typename ParserType<T1>::Parser x,std::function<typename ParserType<T2>::Parser(T1)> y)
+    inline typename ParserType<T2>::Parser Bind(typename ParserType<T1>::Parser x,std::function<typename ParserType<T2>::Parser(const T1&)> y)
     {
         return [x,y](const ParserStream& inp)->typename ParserType<T2>::Result{
             auto r = x(inp);
@@ -95,6 +96,7 @@ namespace Lex {
             
         };
     }
+    
     
     template<typename T>
     inline typename ParserType<T>::Parser ChooseN(const std::list<typename ParserType<T>::Parser>& ps)
@@ -149,6 +151,22 @@ namespace Lex {
         
     }
     
+    extern ParserType<std::list<char>>::Parser whiteParser;
+    
+    template<typename T>
+    inline typename ParserType<T>::Parser Token(typename ParserType<T>::Parser f)
+    {
+        auto preWhite = Bind<std::list<char>, T>(whiteParser, [f](const std::list<char>&)->typename ParserType<T>::Parser{
+            return f;
+        });
+        auto postWhite = Bind<T, T>(preWhite,[f](const T& p)->typename ParserType<T>::Parser{
+            return [p](const Lex::ParserStream& inp)->typename ParserType<T>::Result{
+                auto _post = whiteParser(inp);
+                return Lex::LexResult<T>::Some(p,_post->remain());
+            };
+        });
+        return postWhite;
+    }
     
     ParserType<char>::Result item(const ParserStream& inp);
     ParserType<char>::Parser satParser(std::function<bool(char)> f);

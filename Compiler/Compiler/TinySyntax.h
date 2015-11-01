@@ -184,6 +184,8 @@ namespace Parser {
             
         }
         void Visit(std::shared_ptr<NodeVisitor> vi);
+      
+        std::shared_ptr<ExpNode> GetExp(){return _exp;}
     };
     
     class NodeVisitor
@@ -195,6 +197,8 @@ namespace Parser {
     
     typedef std::shared_ptr<ExpNode> ExpNodePtr;
     typedef std::shared_ptr<StatementSeq> StatementSeqPtr;
+    typedef std::shared_ptr<ReadStatement> ReadStatementPtr;
+    typedef std::shared_ptr<WriteStatement> WriteStatementPtr;
 }
 
 
