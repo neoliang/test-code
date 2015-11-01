@@ -11,7 +11,6 @@ namespace Parser{
     
     void ConstExp:: Visit(std::shared_ptr<NodeVisitor> vi)
     {
-        
     }
     
     void IdExp:: Visit(std::shared_ptr<NodeVisitor> vi)

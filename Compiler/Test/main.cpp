@@ -18,7 +18,8 @@ using namespace Lex;
 
 void TestLex();
 int main() {
-    TestLex();
+    //TestLex();
+    cout << isalpha('(') << endl;
     TestTinyParser();
     return 0;
 }

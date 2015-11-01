@@ -9,5 +9,5 @@
 #include "ParserStream.h"
 
 namespace Lex {
-    const std::istream_iterator<char> ParserStream::end;
+    //const std::istream_iterator<char> ParserStream::end;
 }

@@ -35,12 +35,12 @@ namespace Parser
         else
         {
             std::stringstream ss;
-            std::cout << dig->value().size() << std::endl;
             for (std::list<char>::const_iterator iter  = dig->value().begin();iter != dig->value().end();++iter)
             {
-                std::cout << *iter << std::endl;
+                ss << *iter;
             }
             int vi =0;
+            ss >> vi;
             return Lex::LexResult<ExpNodePtr>::Some(ExpNodePtr(new ConstExp(dig->remain().lineNum(),vi)), dig->remain());
         }
     }
@@ -57,15 +57,34 @@ namespace Parser
         }
     }
     
+    using namespace Lex;
+    //same as regular expression cocatnation but more powerfull
+    typename ParserType<ExpNodePtr>::Parser Bindxx(typename ParserType<char>::Parser x,std::function<typename ParserType<ExpNodePtr>::Parser(char)> y)
+    {
+        return [x,y](const ParserStream& inp)->typename ParserType<ExpNodePtr>::Result{
+            auto r = x(inp);
+            if (r->isNone()) {
+                return LexResult<ExpNodePtr>::None();
+            }
+            else
+            {
+                return (y(r->value()))(r->remain());
+            }
+            
+        };
+    }
+    
     Lex::ParserType<ExpNodePtr>::Result ParserFactor(const Lex::ParserStream& inp)
     {
-        auto lexp = Lex::Bind<char, ExpNodePtr>(Lex::satParser([](char c){return c== '(';}), [](char )->typename Lex::ParserType<ExpNodePtr>::Parser{
-                return ParserExp;
+        auto lexp = Bindxx(Lex::satParser([](char c){
+            return c== '(';
+        }), [](char )->typename Lex::ParserType<ExpNodePtr>::Parser{
+            return ParserExp;
         });
         auto fexp = Lex::Bind<ExpNodePtr, ExpNodePtr>(lexp, [](ExpNodePtr exp)->typename Lex::ParserType<ExpNodePtr>::Parser{
             return [exp](const Lex::ParserStream& inp)->typename Lex::ParserType<ExpNodePtr>::Result
             {
-                auto rexp = Lex::satParser([](char c){return c== '(';})(inp);
+                auto rexp = Lex::satParser([](char c){return c== ')';})(inp);
                 if (rexp->isNone()) {
                     return Lex::LexResult<ExpNodePtr>::None();
                 }

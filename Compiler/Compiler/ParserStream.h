@@ -11,15 +11,16 @@
 #include <sstream>
 #include <fstream>
 #include <memory>
+#include <iostream>
 namespace Lex {
     
     class ParserStream
     {
-        const static std::istream_iterator<char> end;
+        std::string::iterator end;
     private:
-        std::shared_ptr<std::istream> _stream;
+        std::shared_ptr<std::string> _stream;
         unsigned int _lineNum = 0;
-        std::istream_iterator<char> iter;
+        std::string::iterator iter;
         unsigned int _currentCol =0;
         
         void moveToNext()
@@ -37,30 +38,31 @@ namespace Lex {
                 ++_currentCol;
             }
         }
-        ParserStream(std::istream* stream)
+        ParserStream(std::string* stream)
         {
-            stream->unsetf(std::ios::skipws);
-            _stream = std::shared_ptr<std::istream>(stream);
-            iter = std::istream_iterator<char>(*stream);
+            //stream->unsetf(std::ios::skipws);
+            _stream = std::shared_ptr<std::string>(stream);
+            iter = _stream->begin();
+            end = _stream->end();
         }
     public:
         ParserStream(){};
         static ParserStream fromString(const std::string& content)
         {
-            return ParserStream(new std::istringstream(content));
+            return ParserStream(new std::string(content));
         }
-        static ParserStream fromFile(const std::string& file)
-        {
-            std::ifstream* fs = new std::ifstream();
-            fs->open(file);
-            if (fs->is_open()) {
-                return ParserStream(fs);
-            }
-            else
-            {
-                throw std::bad_exception();
-            }
-        }
+//        static ParserStream fromFile(const std::string& file)
+//        {
+//            std::ifstream* fs = new std::ifstream();
+//            fs->open(file);
+//            if (fs->is_open()) {
+//                return ParserStream(fs);
+//            }
+//            else
+//            {
+//                throw std::bad_exception();
+//            }
+//        }
     public:
         bool empty()const
         {
@@ -69,6 +71,7 @@ namespace Lex {
         char get()const
         {
             if (empty()) {
+                std::cout << "try to ge empty stream" << std::endl;
                 throw std::bad_exception();
             }
             return *iter;
