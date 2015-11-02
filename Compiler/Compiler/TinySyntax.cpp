@@ -33,4 +33,20 @@ namespace Parser{
         
     }
     
+    void AssignStatement::Visit(std::shared_ptr<NodeVisitor> vi)
+    {
+        
+    }
+    void RepeatStatement::Visit(std::shared_ptr<NodeVisitor> vi)
+    {
+        
+    }
+    void IfStatement::Visit(std::shared_ptr<NodeVisitor> vi)
+    {
+        
+    }
+    void StatementSeq::Visit(std::shared_ptr<NodeVisitor> vi)
+    {
+        
+    }
 }

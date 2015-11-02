@@ -9,17 +9,32 @@
 #include "Lex.h"
 namespace Lex{
     
-    ParserType<std::list<char>>::Result digitsParser(const ParserStream& inp)
+    ParserType<std::string>::Parser charListToString(const ParserType<std::list<char>>::Parser& charsP)
     {
-        return Token<std::list<char>>(Many1<char>(satParser([](char c){
-            return isnumber(c);
-        })))(inp);
+        return [charsP](const Lex::ParserStream& inp)->typename ParserType<std::string>::Result{
+            auto r = charsP(inp);
+            if (r->isNone()) {
+                return Lex::LexResult<std::string>::None();
+            }
+            else
+            {
+                auto str = std::string(r->value().begin(),r->value().end());
+                return Lex::LexResult<std::string>::Some(str,r->remain());
+            }
+        };
     }
-    ParserType<std::list<char>>::Result idParser(const ParserStream& inp)
+    
+    ParserType<std::string>::Result digitsParser(const ParserStream& inp)
     {
-        return Token<std::list<char>>(Many1<char>(satParser([](char c){
+        return Token<std::string>( charListToString(Many1<char>(satParser([](char c){
+            return isnumber(c);
+        }))))(inp);
+    }
+    ParserType<std::string>::Result idParser(const ParserStream& inp)
+    {
+        return Token<std::string>(charListToString(Many1<char>(satParser([](char c){
             return isalpha(c);
-        })))(inp);
+        }))))(inp);
     }
     
     ParserType<std::list<char>>::Result whiteParser(const ParserStream& inp)

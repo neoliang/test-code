@@ -128,7 +128,9 @@ namespace Parser {
         ,_else(elseStmtSeq)
         ,_then(thenStmtSeq)
         {}
-        
+        std::shared_ptr<ExpNode> GetExp()const{return _exp;}
+        std::shared_ptr<StatementSeq> GetThenStmt()const {return _then;}
+        std::shared_ptr<StatementSeq> GetElseStmt()const {return _else;}
         void Visit(std::shared_ptr<NodeVisitor> vi);
         
     };
@@ -145,6 +147,8 @@ namespace Parser {
         ,_stateSeq(stmtSeq)
         {}
         
+        std::shared_ptr<StatementSeq> GetStmtSeq()const {return _stateSeq;}
+        std::shared_ptr<ExpNode> GetExp()const{return _exp;}
         void Visit(std::shared_ptr<NodeVisitor> vi);
     };
     
@@ -160,6 +164,7 @@ namespace Parser {
         ,_exp(exp)
         {}
         void Visit(std::shared_ptr<NodeVisitor> vi);
+        std::shared_ptr<ExpNode> GetExp()const{return _exp;}
     };
     
     class ReadStatement : public StatementNode
@@ -195,10 +200,15 @@ namespace Parser {
         virtual void Accept(const SyntaxNode& node) {};
     };
     
+    
     typedef std::shared_ptr<ExpNode> ExpNodePtr;
+    typedef std::shared_ptr<StatementNode> StatementNodePtr;
     typedef std::shared_ptr<StatementSeq> StatementSeqPtr;
     typedef std::shared_ptr<ReadStatement> ReadStatementPtr;
     typedef std::shared_ptr<WriteStatement> WriteStatementPtr;
+    typedef std::shared_ptr<AssignStatement> AssignStatementPtr;
+    typedef std::shared_ptr<IfStatement> IfStatementPtr;
+    typedef std::shared_ptr<RepeatStatement> RepeatStatementPtr;
 }
 
 

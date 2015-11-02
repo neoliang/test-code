@@ -63,6 +63,7 @@ namespace Lex {
     {
         typedef std::shared_ptr<LexResult<T>> Result;
         typedef std::function<Result(const ParserStream&)> Parser;
+        typedef T ElemntT;
         static Parser ret(T t)
         {
             return [t](const ParserStream& inp)->Result
@@ -168,12 +169,13 @@ namespace Lex {
         return postWhite;
     }
     
+    ParserType<std::string>::Parser charListToString(const ParserType<std::list<char>>::Parser&);
     ParserType<char>::Parser satParser(std::function<bool(char)> f);
     ParserType<char>::Parser charParser(char c);
     ParserType<std::string>::Parser charsParser(char c);
     ParserType<std::string>::Parser strParser(const std::string& str);
     ParserType<char>::Result item(const ParserStream& inp);
-    ParserType<std::list<char>>::Result digitsParser(const ParserStream& inp);
-    ParserType<std::list<char>>::Result idParser(const ParserStream& inp);
+    ParserType<std::string>::Result digitsParser(const ParserStream& inp);
+    ParserType<std::string>::Result idParser(const ParserStream& inp);
 }
 #endif /* defined(__Compiler__Lex__) */

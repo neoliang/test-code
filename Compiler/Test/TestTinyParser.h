@@ -97,7 +97,7 @@ inline void TestTinyParser()
         auto stream = Lex::ParserStream::fromString(str);
         auto exp = Parser::ParserWrite(stream);
         RC_ASSERT(!exp->isNone());
-        auto wr = exp->value();
+        auto wr = std::dynamic_pointer_cast<Parser::WriteStatement>(exp->value());
         auto uexp = std::dynamic_pointer_cast<Parser::UnaryOpExp>(wr->GetExp());
         RC_ASSERT(uexp != nullptr);
         auto rightExp = std::dynamic_pointer_cast<Parser::UnaryOpExp>(uexp->GetRightExp());
@@ -106,26 +106,83 @@ inline void TestTinyParser()
         RC_ASSERT(std::dynamic_pointer_cast<Parser::ConstExp>(rightExp->GetRightExp())->GetNumber() == number1 );
         RC_ASSERT(std::dynamic_pointer_cast<Parser::ConstExp>(uexp->GetLeftExp())->GetNumber() == number);
     });
+            
+
     
-
-    //read state
-    rc::check("read id",[ ](){
-        const std::string& str = "hello";
-        bool isid = true;
-        std::for_each(str.begin(), str.end(), [&isid](const char& c){
-            if (!isalpha(c)) {
-                isid = false;
-            }
-        });
-        if (isid && !str.empty()) {
-            
-            auto stream = Lex::ParserStream::fromString("read " + str);
-            auto r = Parser::ParserRead(stream);
-            RC_ASSERT(!r->isNone());
-            
-        }
-
+    //assignment
+    rc::check("hello := number+number*number",[](const int& n,const int & n1,const int& n2){
+        int number2 = abs(n2);
+        int number = abs(n);
+        int number1 = abs(n1);
+        auto str = std::string("hello := ") + toString(number) + "+" + toString(number2) + "*" + toString(number1);
+        auto stream = Lex::ParserStream::fromString(str);
+        auto exp = Parser::ParserAssignment(stream);
+        RC_ASSERT(!exp->isNone());
+        auto wr = std::dynamic_pointer_cast<Parser::AssignStatement>(exp->value());
+        auto uexp = std::dynamic_pointer_cast<Parser::UnaryOpExp>(wr->GetExp());
+        RC_ASSERT(uexp != nullptr);
+        auto rightExp = std::dynamic_pointer_cast<Parser::UnaryOpExp>(uexp->GetRightExp());
+        RC_ASSERT( rightExp != nullptr);
+        RC_ASSERT(std::dynamic_pointer_cast<Parser::ConstExp>(rightExp->GetLeftExp())->GetNumber() == number2 );
+        RC_ASSERT(std::dynamic_pointer_cast<Parser::ConstExp>(rightExp->GetRightExp())->GetNumber() == number1 );
+        RC_ASSERT(std::dynamic_pointer_cast<Parser::ConstExp>(uexp->GetLeftExp())->GetNumber() == number);
     });
+
+    //ifstate
+    rc::check("if number < number then word:= 123 end",[](const int& n,const int & n1){
+        int number = abs(n);
+        int number1 = abs(n1);
+        auto str = std::string("if ") + toString(number) + " < " + toString(number1) + " then \n word:= 1\n end";
+        auto stream = Lex::ParserStream::fromString(str);
+        auto exp = Parser::ParserIfStatment(stream);
+        RC_ASSERT(!exp->isNone());
+        auto wr = std::dynamic_pointer_cast<Parser::IfStatement>(exp->value());
+        auto uexp = std::dynamic_pointer_cast<Parser::UnaryOpExp>(wr->GetExp());
+        auto thenStmt = wr->GetThenStmt();
+        RC_ASSERT(thenStmt != nullptr);
+        RC_ASSERT(wr->GetElseStmt() == nullptr);
+        RC_ASSERT(uexp != nullptr);
+        auto rightExp = std::dynamic_pointer_cast<Parser::ConstExp>(uexp->GetRightExp());
+        RC_ASSERT( rightExp != nullptr);
+        RC_ASSERT(rightExp->GetNumber() == number1 );
+        RC_ASSERT(uexp->GetOp() == "<");
+        RC_ASSERT(std::dynamic_pointer_cast<Parser::ConstExp>(uexp->GetLeftExp())->GetNumber() == number);
+    });
+    
+    rc::check("if number < number then word:= 123 else word := word - 1; \n hello := 8 end",[](const int& n,const int & n1){
+        int number = abs(n);
+        int number1 = abs(n1);
+        auto str = std::string("if ") + toString(number) + " < " + toString(number1) + " then \n word:= word -1\n else \nword := 47; \n hello := 8 end";
+        auto stream = Lex::ParserStream::fromString(str);
+        auto exp = Parser::ParserIfStatment(stream);
+        RC_ASSERT(!exp->isNone());
+        auto wr = std::dynamic_pointer_cast<Parser::IfStatement>(exp->value());
+        auto uexp = std::dynamic_pointer_cast<Parser::UnaryOpExp>(wr->GetExp());
+        auto thenStmt = wr->GetThenStmt();
+        RC_ASSERT(thenStmt != nullptr);
+        RC_ASSERT(wr->GetElseStmt() != nullptr);
+        RC_ASSERT(uexp != nullptr);
+        auto rightExp = std::dynamic_pointer_cast<Parser::ConstExp>(uexp->GetRightExp());
+        RC_ASSERT( rightExp != nullptr);
+        RC_ASSERT(rightExp->GetNumber() == number1 );
+        RC_ASSERT(uexp->GetOp() == "<");
+        RC_ASSERT(std::dynamic_pointer_cast<Parser::ConstExp>(uexp->GetLeftExp())->GetNumber() == number);
+    });
+    
+    
+    //repeate statement
+    
+    auto str = std::string("repeat\n\tx := x - 1\nuntil x = 0\n");
+    auto stream = Lex::ParserStream::fromString(str);
+    auto r = Parser::ParserRepeatStatement(stream);
+    RC_ASSERT(!r->isNone());
+    auto rs = std::dynamic_pointer_cast<Parser::RepeatStatement>(r->value());
+    auto exprep = std::dynamic_pointer_cast<Parser::UnaryOpExp>(rs->GetExp());
+    RC_ASSERT(exprep != nullptr);
+    RC_ASSERT(exprep->GetOp() == "=");
+    RC_ASSERT(std::dynamic_pointer_cast<Parser::ConstExp>(exprep->GetRightExp())->GetNumber() == 0);
+    RC_ASSERT(rs->GetStmtSeq() != nullptr);
+    RC_ASSERT(rs != nullptr);
 }
 
 #endif
