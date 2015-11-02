@@ -9,16 +9,25 @@
 #include "Lex.h"
 namespace Lex{
     
-    ParserType<std::list<char>>::Parser digitsParser = Many1<char>(satParser([](char c){
+    ParserType<std::list<char>>::Result digitsParser(const ParserStream& inp)
+    {
+        return Token<std::list<char>>(Many1<char>(satParser([](char c){
             return isnumber(c);
-        }));
+        })))(inp);
+    }
+    ParserType<std::list<char>>::Result idParser(const ParserStream& inp)
+    {
+        return Token<std::list<char>>(Many1<char>(satParser([](char c){
+            return isalpha(c);
+        })))(inp);
+    }
     
-    ParserType<std::list<char>>::Parser whiteParser = Many<char>(satParser([](char c){
-        return c == ' ' || c == '\n' || c == '\t';
-    }));
-    ParserType<std::list<char>>::Parser idParser =  Many1<char>(satParser([](char c){
-        return isalpha(c);
-    }));
+    ParserType<std::list<char>>::Result whiteParser(const ParserStream& inp)
+    {
+        return  Many<char>(satParser([](char c){
+            return c == ' ' || c == '\n' || c == '\t';
+        }))(inp);
+    }
     ParserType<char>::Result item(const  ParserStream& inp)
     {
         if (inp.empty()) {

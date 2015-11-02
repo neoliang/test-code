@@ -74,6 +74,11 @@ void TestLex()
         RC_ASSERT(r->remain().empty());
     });
     
+    
+    //wihte space
+    auto stream = ParserStream::fromString("0");
+    auto r = Lex::whiteParser(stream);
+    RC_ASSERT(!r->isNone());
     //digit
     rc::check("digits",[](const unsigned int& number){
         stringstream ss;

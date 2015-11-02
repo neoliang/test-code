@@ -151,7 +151,7 @@ namespace Lex {
         
     }
     
-    extern ParserType<std::list<char>>::Parser whiteParser;
+    ParserType<std::list<char>>::Result whiteParser(const ParserStream& inp);
     
     template<typename T>
     inline typename ParserType<T>::Parser Token(typename ParserType<T>::Parser f)
@@ -168,12 +168,12 @@ namespace Lex {
         return postWhite;
     }
     
-    ParserType<char>::Result item(const ParserStream& inp);
     ParserType<char>::Parser satParser(std::function<bool(char)> f);
     ParserType<char>::Parser charParser(char c);
     ParserType<std::string>::Parser charsParser(char c);
     ParserType<std::string>::Parser strParser(const std::string& str);
-    extern ParserType<std::list<char>>::Parser digitsParser;
-    extern ParserType<std::list<char>>::Parser idParser;
+    ParserType<char>::Result item(const ParserStream& inp);
+    ParserType<std::list<char>>::Result digitsParser(const ParserStream& inp);
+    ParserType<std::list<char>>::Result idParser(const ParserStream& inp);
 }
 #endif /* defined(__Compiler__Lex__) */

@@ -91,7 +91,7 @@ namespace Parser
     
     Lex::ParserType<ExpNodePtr>::Result ParserFactor(const Lex::ParserStream& inp)
     {
-        auto lexp = Lex::Bind<char, ExpNodePtr>(Lex::satParser([](char c){return c== '(';}),
+        auto lexp = Lex::Bind<char, ExpNodePtr>(Lex::Token<char>(Lex::satParser([](char c){return c== '(';})),
             [](char )->typename Lex::ParserType<ExpNodePtr>::Parser{
                 return ParserExp;
             }
@@ -99,7 +99,7 @@ namespace Parser
         auto fexp = Lex::Bind<ExpNodePtr, ExpNodePtr>(lexp, [](ExpNodePtr exp)->typename Lex::ParserType<ExpNodePtr>::Parser{
             return [exp](const Lex::ParserStream& inp)->typename Lex::ParserType<ExpNodePtr>::Result
             {
-                auto rexp = Lex::satParser([](char c){return c== ')';})(inp);
+                auto rexp = Lex::Token<char>(Lex::satParser([](char c){return c== ')';}))(inp);
                 if (rexp->isNone()) {
                     return Lex::LexResult<ExpNodePtr>::None();
                 }
