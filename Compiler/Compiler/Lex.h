@@ -26,6 +26,7 @@ namespace Lex {
         ParserStream _remain;
         bool _isNone = true;
     public:
+        typedef T LexType;
         LexResult()
         {}
         LexResult(const T& v,const ParserStream& r)
@@ -97,7 +98,11 @@ namespace Lex {
             
         };
     }
-    
+#define CONS(ct,e1,r) return Lex::Bind<decltype(e1(Lex::ParserStream()))::element_type::LexType,ct>(e1, [&](const decltype(e1(Lex::ParserStream()))::element_type::LexType& r )->typename Lex::ParserType<ct>::Parser{
+
+#define EndCONS })
+
+#define RET(e) return Lex::ParserType<decltype(e)>::ret(e)
     
     template<typename T>
     inline typename ParserType<T>::Parser ChooseN(const std::list<typename ParserType<T>::Parser>& ps)

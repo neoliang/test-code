@@ -12,7 +12,7 @@
 #include <vector>
 #include <memory>
 #include <string>
-
+#include <functional>
 namespace Parser {
     class NodeVisitor;
     
@@ -111,6 +111,10 @@ namespace Parser {
         {
             _statements.push_back(statement);
         }
+        void foreach(std::function<void(std::shared_ptr<StatementNode>)> v)
+        {
+            std::for_each(_statements.begin(), _statements.end(), v);
+        }
         void Visit(std::shared_ptr<NodeVisitor> vi);
     };
     
@@ -165,6 +169,7 @@ namespace Parser {
         {}
         void Visit(std::shared_ptr<NodeVisitor> vi);
         std::shared_ptr<ExpNode> GetExp()const{return _exp;}
+        const std::string& GetIdentifier()const{return _identifier;}
     };
     
     class ReadStatement : public StatementNode
@@ -175,6 +180,7 @@ namespace Parser {
         :StatementNode(lineno)
         ,_identifier(id)
         {}
+        const std::string& GetIdentifier()const{return _identifier;}
         void Visit(std::shared_ptr<NodeVisitor> vi);
     };
     
@@ -200,7 +206,9 @@ namespace Parser {
         virtual void Accept(const SyntaxNode& node) {};
     };
     
-    
+    typedef std::shared_ptr<UnaryOpExp> UnaryExpPtr;
+    typedef std::shared_ptr<ConstExp> ConstExpPtr;
+    typedef std::shared_ptr<IdExp> IdExpPtr;
     typedef std::shared_ptr<ExpNode> ExpNodePtr;
     typedef std::shared_ptr<StatementNode> StatementNodePtr;
     typedef std::shared_ptr<StatementSeq> StatementSeqPtr;

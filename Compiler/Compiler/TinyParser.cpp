@@ -16,19 +16,25 @@ namespace Parser
      if exp then stmt-seq {else stmt-sequence} end
      */
 #define TOKEN(t) Lex::Token<std::string>(Lex::strParser(t))
-#define Continues(T1,e1,r1) return Lex::Bind<T1, StatementNodePtr>(e1,[&](const T1& r1)->typename Lex::ParserType<StatementNodePtr>::Parser{
 #define EndContinues })
+
+#define ContinueWithSt(e1,ret) CONS(StatementNodePtr,e1,ret)
     Lex::ParserType<StatementNodePtr>::Result ParserIfStatment(const Lex::ParserStream& inp)
     {
-        Continues(std::string,TOKEN("if"),_)
-        Continues(ExpNodePtr,ParserExp,exp)
-        Continues(std::string,TOKEN("then"),_)
-        Continues(StatementSeqPtr,ParserStatementSeq,stmtSeq)
+        CONS(StatementNodePtr,TOKEN("if"),_)
+        CONS(StatementNodePtr,ParserExp,exp)
+        CONS(StatementNodePtr,TOKEN("then"),_)
+        CONS(StatementNodePtr,ParserStatementSeq,stmtSeq)
+        
+//        auto elsePart = CONS(StatementSeqPtr,TOKEN("else") , _)
+//        return ParserStatementSeq;
+//        EndCONS;
         
         auto optionElse = Lex::Choice<StatementSeqPtr>(Lex::Bind<std::string, StatementSeqPtr>(TOKEN("else"), [](const std::string&)->typename Lex::ParserType<StatementSeqPtr>::Parser{
             return ParserStatementSeq;
+            
         }), Lex::ParserType<StatementSeqPtr>::ret(nullptr)) ;
-        Continues(StatementSeqPtr, optionElse, elseExp)
+        CONS(StatementNodePtr, optionElse, elseExp)
         return [&](const Lex::ParserStream& inp)->Lex::ParserType<StatementNodePtr>::Result{
             auto rend = TOKEN("end")(inp);
             if(rend->isNone())
@@ -55,20 +61,12 @@ namespace Parser
 
     Lex::ParserType<StatementNodePtr>::Result ParserRepeatStatement(const Lex::ParserStream& inp)
     {
-        Continues(std::string, TOKEN("repeat"), _)
-        Continues(StatementSeqPtr, ParserStatementSeq, stmtSeq)
-        Continues(std::string, TOKEN("until"), _)
-        return [&](const Lex::ParserStream& inp)->Lex::ParserType<StatementNodePtr>::Result{
-            auto rExp = ParserExp(inp);
-            if (rExp->isNone()) {
-                return Lex::LexResult<StatementNodePtr>::None();
-            }
-            else
-            {
-                auto repStmt = RepeatStatementPtr(new RepeatStatement(rExp->remain().lineNum(),rExp->value(),stmtSeq));
-                return Lex::LexResult<StatementNodePtr>::Some(repStmt, rExp->remain());
-            }
-        };
+        ContinueWithSt(TOKEN("repeat"), _)
+        ContinueWithSt(Parser::ParserStatementSeq, stmtSeq)
+        ContinueWithSt(TOKEN("until"), _)
+        ContinueWithSt(Parser::ParserExp, rExp)
+        RET(StatementNodePtr(new RepeatStatement(stmtSeq->LineNo(),rExp,stmtSeq)));
+        EndContinues;
         EndContinues;
         EndContinues;
         EndContinues(inp);

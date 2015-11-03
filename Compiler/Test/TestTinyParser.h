@@ -186,7 +186,7 @@ inline void TestTinyParser()
     
     //all
     {
-        auto str = std::string("x := 10;\nrepeat \n\tx := x - 1;\n\tif x = 2 then\n\t\twrite x\n\telse\n\t\twrite x + 1\n\tend\nuntil x = 0");
+        auto str = std::string("x := 10;\nrepeat \n\tx := x - 1;\n\tif x = 2 then\n\t\twrite x\n\telse\n\t\twrite x + 1\n\tend\nuntil x = 0; write x");
         
         auto stream = Lex::ParserStream::fromString(str);
         auto r = Parser::ParserStatementSeq(stream);

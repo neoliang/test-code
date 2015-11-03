@@ -11,29 +11,40 @@
 #include <fstream>
 #include <sstream>
 #include "TinyParser.h"
+#include "RunTime.h"
+#include <iostream>
+
+
+using namespace std;
 int main(int argc, const char * argv[]) {
-//    std::istringstream iss("hello word");
-//    std::istream_iterator<char> issi(iss);
-//    std::istream_iterator<char> end;
-//    unsigned int i =0;
-//    while (issi != end) {
-//        std::cout<< *issi ;
-//        ++issi;
-//    }
-//    std::cout << std::endl;
-    // insert code here..
-//    Lex::ParserStream s = Lex::ParserStream::fromString("hellow world");
-//    Lex::ParserType<std::string>::Parser helloParser = Lex::strParser("hello");
-//    auto r = helloParser(s);
-//    std::cout << r->value() << std::endl;
-//    auto digits = Lex::digitsParser(Lex::ParserStream::fromString("90+23*55 xxxx"));
-//    auto l = digits->value();
-//    std::string x(l.begin(),l.end());
-//    std::cout << x << std::endl;
     
-    auto stream = Lex::ParserStream::fromString("23");
-    auto exp = Parser::Exp(stream);
-    std::istream_iterator<char> 
-    std::istringstream ss = std::stringstream("hellll aaaa");
-    return 0;
+    if (argc < 2) {
+        return  1;
+    }
+    
+    FILE *fp = fopen(argv[1], "r");
+    if (fp == nullptr) {
+        cout << "open file error " << argv[1] << endl;
+        return 1;
+    }
+    
+    fseek(fp,0,SEEK_END);
+    long s = ftell(fp);
+    fseek(fp,0,SEEK_SET);
+    char *pBuffer  = new  char[s];
+    s = fread(pBuffer,sizeof(char), s,fp);
+    fclose(fp);
+    std::string str(pBuffer,pBuffer +s);
+    auto r = Parser::ParserStatementSeq(Lex::ParserStream::fromString(str));
+    TinyRunTime runtime;
+    if (!r->isNone()) {
+        runtime.ExeStatmentSeq(r->value());
+        return 0;
+    }
+    else
+    {
+        cout << "parser error in " << r->remain().lineNum() << endl;
+        return 1;
+    }
+    
 }
