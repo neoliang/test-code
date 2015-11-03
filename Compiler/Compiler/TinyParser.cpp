@@ -19,24 +19,25 @@ namespace Parser
 #define EndContinues })
 
 #define ContinueWithSt(e1,ret) CONS(StatementNodePtr,e1,ret)
+    /*
+    let _ <- Token("if")
+    let exp <- ParserExp
+    let _ <- Token("then")
+    let stmtSeq <- ParserStatementSeq
+    let elseExp <- optionElse
+    let _ <- Token("end")
+      return IfStatement(exp->LineNo(), exp,stmtSeq,elseExp))
+    */
     Lex::ParserType<StatementNodePtr>::Result ParserIfStatment(const Lex::ParserStream& inp)
     {
         auto elsePart  = CONSF(StatementSeqPtr,TOKEN("else") , _) return ParserStatementSeq; EndCONS;
         auto optionElse = CHOICE(elsePart, RETF(StatementSeqPtr(nullptr))) ;
-        
-        //let _ <- Token("if")
-        //let exp <- ParserExp
-        //let _ <- Token("then")
-        //let stmtSeq <- ParserStatementSeq
-        //let elseExp <- optionElse
-        //let _ <- Token("end")
-        //  return IfStatement(exp->LineNo(), exp,stmtSeq,elseExp))
-        CONS(StatementNodePtr,TOKEN("if"),_)
-        CONS(StatementNodePtr,ParserExp,exp)
-        CONS(StatementNodePtr,TOKEN("then"),_)
-        CONS(StatementNodePtr,ParserStatementSeq,stmtSeq)
-        CONS(StatementNodePtr, optionElse, elseExp)
-        CONS(StatementNodePtr,TOKEN("end") , _)
+        ContinueWithSt(TOKEN("if"),_)
+        ContinueWithSt(ParserExp,exp)
+        ContinueWithSt(TOKEN("then"),_)
+        ContinueWithSt(ParserStatementSeq,stmtSeq)
+        ContinueWithSt( optionElse, elseExp)
+        ContinueWithSt(TOKEN("end") , _)
         RET(StatementNodePtr(new IfStatement(exp->LineNo(), exp,stmtSeq,elseExp)));
         EndContinues;
         EndContinues;
@@ -49,8 +50,6 @@ namespace Parser
     /*
      repeate stmt-seq until exp
      */
-
-
     Lex::ParserType<StatementNodePtr>::Result ParserRepeatStatement(const Lex::ParserStream& inp)
     {
         ContinueWithSt(TOKEN("repeat"), _)
@@ -66,13 +65,10 @@ namespace Parser
     
     Lex::ParserType<StatementSeqPtr>::Result ParserStatementSeq(const Lex::ParserStream& inp)
     {
-        return Lex::Bind<StatementNodePtr, StatementSeqPtr>(ParserStatement, [](StatementNodePtr stmt)->typename Lex::ParserType<StatementSeqPtr>::Parser{
-            
-            auto optionPart = Lex::Bind<std::string, StatementNodePtr>(Lex::Token<std::string>(Lex::charsParser(';')), [](const std::string&)->typename Lex::ParserType<StatementNodePtr>::Parser{
-                return ParserStatement;
-            });
-            auto optioPartList = Lex::Many<StatementNodePtr>(optionPart);
-            
+        auto optionPart = CONSF(StatementNodePtr,Lex::Token<std::string>(Lex::charsParser(';')) , _)
+        return ParserStatement; EndCONS;
+        auto optioPartList =  Lex::Many<StatementNodePtr>(optionPart);
+        CONS(StatementSeqPtr, ParserStatement, stmt)
             return [optioPartList,stmt](const Lex::ParserStream& inp)->typename Lex::ParserType<StatementSeqPtr>::Result{
                 auto r = optioPartList(inp);
                 auto stmtseq = StatementSeqPtr(new StatementSeq(inp.lineNum()));
@@ -89,7 +85,7 @@ namespace Parser
                 }
             };
             
-        })(inp);
+        EndCONS(inp);
     }
     
     Lex::ParserType<StatementNodePtr>::Result ParserStatement(const Lex::ParserStream& inp)
@@ -99,59 +95,31 @@ namespace Parser
     
     Lex::ParserType<StatementNodePtr>::Result ParserAssignment(const Lex::ParserStream& inp)
     {
-        return Lex::Bind<std::string, StatementNodePtr>(Lex::idParser, [](const std::string& id)->typename Lex::ParserType<StatementNodePtr>::Parser{
-            return Lex::Bind<std::string, StatementNodePtr>(TOKEN(":="),[id](const std::string& )->typename Lex::ParserType<StatementNodePtr>::Parser{
-                return [id](const Lex::ParserStream& inp)->typename Lex::ParserType<StatementNodePtr>::Result{
-                    auto r = ParserExp(inp);
-                    if (r->isNone()) {
-                        return Lex::LexResult<StatementNodePtr>::None();
-                    }
-                    else
-                    {
-                        auto assinState = AssignStatementPtr(new AssignStatement(r->remain().lineNum(),id,r->value()));
-                        return Lex::LexResult<StatementNodePtr>::Some(assinState, r->remain());
-                    }
-                };
-            });
-
-            
-        })(inp);
+        ContinueWithSt(Lex::idParser , id)
+        ContinueWithSt(TOKEN(":="), _)
+        ContinueWithSt( ParserExp, exp)
+        RET(StatementNodePtr(new AssignStatement(inp.lineNum(),id,exp)));
+        EndCONS;
+        EndCONS;
+        EndCONS(inp);
     }
 
     Lex::ParserType<StatementNodePtr>::Result ParserRead(const Lex::ParserStream& inp)
     {
-        auto _paser = Lex::Bind<std::string, StatementNodePtr>(Lex::Token<std::string>(Lex::strParser("read")), [](const std::string&)->typename Lex::ParserType<StatementNodePtr>::Parser{
-            return [](const Lex::ParserStream& inp)->typename Lex::ParserType<StatementNodePtr>::Result{
-                auto id = Lex::idParser(inp);
-                if (id->isNone()) {
-                    return Lex::LexResult<StatementNodePtr>::None();
-                }
-                else
-                {
-                    auto readState =  ReadStatementPtr(new ReadStatement(id->remain().lineNum(),id->value()));
-                    return Lex::LexResult<StatementNodePtr>::Some(readState, id->remain());
-                }
-            };
-        });
-        return _paser(inp);
+        ContinueWithSt(Lex::Token<std::string>(Lex::strParser("read")) , _)
+        ContinueWithSt( Lex::idParser, id)
+        RET(StatementNodePtr(new ReadStatement(inp.lineNum(),id)));
+        EndCONS;
+        EndCONS(inp);
     }
     
     Lex::ParserType<StatementNodePtr>::Result ParserWrite(const Lex::ParserStream& inp)
     {
-        auto _paser = Lex::Bind<std::string, StatementNodePtr>(Lex::Token<std::string>(Lex::strParser("write")), [](const std::string&)->typename Lex::ParserType<StatementNodePtr>::Parser{
-            return [](const Lex::ParserStream& inp)->typename Lex::ParserType<StatementNodePtr>::Result{
-                auto id = ParserExp(inp);
-                if (id->isNone()) {
-                    return Lex::LexResult<StatementNodePtr>::None();
-                }
-                else
-                {
-                    auto writeState =  WriteStatementPtr(new WriteStatement(id->remain().lineNum(),id->value()));
-                    return Lex::LexResult<StatementNodePtr>::Some(writeState, id->remain());
-                }
-            };
-        });
-        return _paser(inp);
+        ContinueWithSt( Lex::Token<std::string>(Lex::strParser("write")), _)
+        ContinueWithSt( ParserExp, exp)
+        RET(StatementNodePtr(new WriteStatement(inp.lineNum(),exp)));
+        EndCONS;
+        EndCONS(inp);
     }
     
     ExpNodePtr Exp(const Lex::ParserStream& inp)

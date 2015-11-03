@@ -36,6 +36,7 @@ namespace Parser {
     
     Lex::ParserType<StatementNodePtr>::Result ParserStatement(const Lex::ParserStream& inp);
     Lex::ParserType<StatementSeqPtr>::Result ParserStatementSeq(const Lex::ParserStream& inp);
+    Lex::ParserType<StatementSeqPtr>::Parser StmtListToSeq(const Lex::ParserType<std::list<StatementNodePtr>>::Parser& p);
 }
 
 #endif /* defined(__Compiler__TinyParser__) */
