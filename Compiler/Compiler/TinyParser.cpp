@@ -21,32 +21,24 @@ namespace Parser
 #define ContinueWithSt(e1,ret) CONS(StatementNodePtr,e1,ret)
     Lex::ParserType<StatementNodePtr>::Result ParserIfStatment(const Lex::ParserStream& inp)
     {
+        auto elsePart  = CONSF(StatementSeqPtr,TOKEN("else") , _) return ParserStatementSeq; EndCONS;
+        auto optionElse = CHOICE(elsePart, RETF(StatementSeqPtr(nullptr))) ;
+        
+        //let _ <- Token("if")
+        //let exp <- ParserExp
+        //let _ <- Token("then")
+        //let stmtSeq <- ParserStatementSeq
+        //let elseExp <- optionElse
+        //let _ <- Token("end")
+        //  return IfStatement(exp->LineNo(), exp,stmtSeq,elseExp))
         CONS(StatementNodePtr,TOKEN("if"),_)
         CONS(StatementNodePtr,ParserExp,exp)
         CONS(StatementNodePtr,TOKEN("then"),_)
         CONS(StatementNodePtr,ParserStatementSeq,stmtSeq)
-        
-//        auto elsePart = CONS(StatementSeqPtr,TOKEN("else") , _)
-//        return ParserStatementSeq;
-//        EndCONS;
-        
-        auto optionElse = Lex::Choice<StatementSeqPtr>(Lex::Bind<std::string, StatementSeqPtr>(TOKEN("else"), [](const std::string&)->typename Lex::ParserType<StatementSeqPtr>::Parser{
-            return ParserStatementSeq;
-            
-        }), Lex::ParserType<StatementSeqPtr>::ret(nullptr)) ;
         CONS(StatementNodePtr, optionElse, elseExp)
-        return [&](const Lex::ParserStream& inp)->Lex::ParserType<StatementNodePtr>::Result{
-            auto rend = TOKEN("end")(inp);
-            if(rend->isNone())
-            {
-                return Lex::LexResult<StatementNodePtr>::None();
-            }
-            else
-            {
-                auto ifStmt = IfStatementPtr(new IfStatement(rend->remain().lineNum(), exp,stmtSeq,elseExp));
-                return Lex::LexResult<StatementNodePtr>::Some(ifStmt, rend->remain());
-            }
-        };
+        CONS(StatementNodePtr,TOKEN("end") , _)
+        RET(StatementNodePtr(new IfStatement(exp->LineNo(), exp,stmtSeq,elseExp)));
+        EndContinues;
         EndContinues;
         EndContinues;
         EndContinues;

@@ -100,10 +100,13 @@ namespace Lex {
     }
 #define CONS(ct,e1,r) return Lex::Bind<decltype(e1(Lex::ParserStream()))::element_type::LexType,ct>(e1, [&](const decltype(e1(Lex::ParserStream()))::element_type::LexType& r )->typename Lex::ParserType<ct>::Parser{
 
+#define CONSF(ct,e1,r) Lex::Bind<decltype(e1(Lex::ParserStream()))::element_type::LexType,ct>(e1, [&](const decltype(e1(Lex::ParserStream()))::element_type::LexType& r )->typename Lex::ParserType<ct>::Parser{
+
+
 #define EndCONS })
 
 #define RET(e) return Lex::ParserType<decltype(e)>::ret(e)
-    
+#define RETF(e) Lex::ParserType<decltype(e)>::ret(e)    
     template<typename T>
     inline typename ParserType<T>::Parser ChooseN(const std::list<typename ParserType<T>::Parser>& ps)
     {
@@ -132,7 +135,7 @@ namespace Lex {
             }
         };
     }
-    
+#define CHOICE(x,y) Lex::Choice<decltype(x(Lex::ParserStream()))::element_type::LexType>(x,y)
     //regular expression +
     template<typename T>
     typename ParserType<std::list<T>>::Parser Many1(typename ParserType<T>::Parser f);
