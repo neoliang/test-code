@@ -158,7 +158,7 @@ namespace Parser
         return Lex::ChooseN<ExpNodePtr>({ParserConst,ParserIdentifier,fexp}) (inp);
     }
     
-    Lex::ParserType<ExpNodePtr>::Parser _ParserUnary(const std::list<char>& ops,const Lex::ParserType<ExpNodePtr>::Parser& parser)
+    Lex::ParserType<ExpNodePtr>::Result _ParserUnary(const Lex::ParserStream& inp,const std::list<char>& ops,Lex::ParserType<ExpNodePtr>::Parser parser)
     {
         auto mulOpParser = Lex::satParser([&](char c)->bool{
             for (auto iter = ops.begin(); iter != ops.end(); ++iter) {
@@ -186,20 +186,21 @@ namespace Parser
         }
         RET(opExp);
         EndCONS;
-        EndCONS;
+        EndCONS(inp);
     }
     Lex::ParserType<ExpNodePtr>::Result ParserTerm(const Lex::ParserStream& inp)
     {
-        return _ParserUnary({'*','/'}, ParserFactor)(inp);
+        return _ParserUnary(inp, {'*','/'}, ParserFactor);
+        //return _term(inp);
     }
     
     Lex::ParserType<ExpNodePtr>::Result ParserSimpleExp(const Lex::ParserStream& inp)
     {
-        return _ParserUnary({'+','-'}, ParserTerm)(inp);
+        return _ParserUnary(inp, {'+','-'}, ParserTerm);
     }
     
     Lex::ParserType<ExpNodePtr>::Result ParserExp(const Lex::ParserStream &inp)
     {
-        return _ParserUnary({'=','<'}, ParserSimpleExp)(inp);
+        return _ParserUnary(inp, {'=','<'}, ParserSimpleExp);
     }
 }
