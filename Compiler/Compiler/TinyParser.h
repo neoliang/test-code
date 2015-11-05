@@ -25,6 +25,7 @@ namespace Parser {
     Lex::ParserType<ExpNodePtr>::Result ParserSimpleExp(const Lex::ParserStream& inp);
     Lex::ParserType<ExpNodePtr>::Result ParserTerm(const Lex::ParserStream& inp);
     Lex::ParserType<ExpNodePtr>::Result ParserFactor(const Lex::ParserStream& inp);
+    Lex::ParserType<ExpNodePtr>::Result ParserFunCall(const Lex::ParserStream& inp);
     
     //statement
     Lex::ParserType<StatementNodePtr>::Result ParserRead(const Lex::ParserStream& inp);
@@ -32,7 +33,7 @@ namespace Parser {
     Lex::ParserType<StatementNodePtr>::Result ParserAssignment(const Lex::ParserStream& inp);
     Lex::ParserType<StatementNodePtr>::Result ParserIfStatment(const Lex::ParserStream& inp);
     Lex::ParserType<StatementNodePtr>::Result ParserRepeatStatement(const Lex::ParserStream& inp);
-    
+    Lex::ParserType<StatementNodePtr>::Result ParserFunStatement(const Lex::ParserStream& inp);
     
     Lex::ParserType<StatementNodePtr>::Result ParserStatement(const Lex::ParserStream& inp);
     Lex::ParserType<StatementSeqPtr>::Result ParserStatementSeq(const Lex::ParserStream& inp);

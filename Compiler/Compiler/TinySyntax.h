@@ -13,6 +13,7 @@
 #include <memory>
 #include <string>
 #include <functional>
+#include <list>
 namespace Parser {
     class NodeVisitor;
     
@@ -43,6 +44,8 @@ namespace Parser {
     {
         using SyntaxNode::SyntaxNode;
     };
+    typedef std::shared_ptr<ExpNode> ExpNodePtr;
+    typedef std::list<ExpNodePtr> ExpNodePtrList;
     
     class ConstExp : public ExpNode
     {
@@ -68,6 +71,27 @@ namespace Parser {
             return _identifier;
         }
         
+        void Visit(std::shared_ptr<NodeVisitor> vi);
+    };
+    
+    class FunCall : public ExpNode
+    {
+        std::string _identifier;
+        ExpNodePtrList _es;
+    public:
+        FunCall(unsigned int lineno,const std::string& id,const ExpNodePtrList& es)
+        :ExpNode(lineno)
+        ,_identifier(id)
+        ,_es(es){}
+        
+        const std::string& GetIdentifier()const
+        {
+            return _identifier;
+        }
+        const ExpNodePtrList& GetExpList()const
+        {
+            return _es;
+        }
         void Visit(std::shared_ptr<NodeVisitor> vi);
     };
     class UnaryOpExp : public ExpNode
@@ -117,7 +141,27 @@ namespace Parser {
         }
         void Visit(std::shared_ptr<NodeVisitor> vi);
     };
-    
+    //function-stmt -> identifier (idlist) stmt-seq [return exp] end
+    class FunStatment : public StatementNode
+    {
+        ExpNodePtr _retExp;
+        std::shared_ptr<StatementSeq> _stmtSeq;
+        std::list<std::string> _params;
+        std::string _name;
+        
+    public:
+        FunStatment(unsigned int lineno, const std::string& name,const std::list<std::string>& params, std::shared_ptr<StatementSeq> stmtSeq,ExpNodePtr exp = nullptr)
+        :StatementNode(lineno)
+        ,_name(name)
+        ,_params(params)
+        ,_stmtSeq(stmtSeq)
+        ,_retExp(exp)
+        {
+            
+        }
+        
+        void Visit(std::shared_ptr<NodeVisitor> vi);
+    };
     class IfStatement : public StatementNode
     {
         std::shared_ptr<ExpNode> _exp;
@@ -209,7 +253,7 @@ namespace Parser {
     typedef std::shared_ptr<UnaryOpExp> UnaryExpPtr;
     typedef std::shared_ptr<ConstExp> ConstExpPtr;
     typedef std::shared_ptr<IdExp> IdExpPtr;
-    typedef std::shared_ptr<ExpNode> ExpNodePtr;
+    
     typedef std::shared_ptr<StatementNode> StatementNodePtr;
     typedef std::shared_ptr<StatementSeq> StatementSeqPtr;
     typedef std::shared_ptr<ReadStatement> ReadStatementPtr;

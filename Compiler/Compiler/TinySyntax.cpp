@@ -49,4 +49,12 @@ namespace Parser{
     {
         
     }
+    void FunCall::Visit(std::shared_ptr<NodeVisitor> vi)
+    {
+        
+    }
+    void FunStatment::Visit(std::shared_ptr<NodeVisitor> vi)
+    {
+        
+    }
 }

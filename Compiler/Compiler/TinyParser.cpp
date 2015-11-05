@@ -12,18 +12,83 @@
 #include "Util.h"
 namespace Parser
 {
+    //idlist -> id {,id}
+    Lex::ParserType<std::list<std::string>>::Result ParserIdList(const Lex::ParserStream& inp)
+    {
+        typedef std::list<std::string> StringListT;
+        auto optionId = CONSF(std::string, TOKEN(","), _)
+        CONS(std::string, Lex::idParser, id)
+        RET((std::string)id);
+        EndCONS;
+        EndCONS;
+        
+        CONS(StringListT, Lex::idParser, x)
+        CONS(StringListT, Lex::Many<std::string>(optionId), xs)
+        auto all = std::list<std::string>();
+        all.push_back(x);
+        all.insert(all.end(), xs.begin(),xs.end());
+        RET(all);
+        EndCONS;
+        EndCONS(inp);
+    }
+    //explist -> exp {,exp}
+    Lex::ParserType<std::list<ExpNodePtr>>::Result ParserExpList(const Lex::ParserStream& inp)
+    {
+        typedef std::list<ExpNodePtr> EList;
+        auto optionId = CONSF(ExpNodePtr, TOKEN(","), _)
+        CONS(ExpNodePtr, ParserExp, exp)
+        RET((ExpNodePtr)exp);
+        EndCONS;
+        EndCONS;
+        
+        CONS(EList, ParserExp, x)
+        CONS(EList, Lex::Many<ExpNodePtr>(optionId), xs)
+        auto all = std::list<ExpNodePtr>();
+        all.push_back(x);
+        all.insert(all.end(), xs.begin(),xs.end());
+        RET(all);
+        EndCONS;
+        EndCONS(inp);
+    }
+    //functioncall -> identifier (explist)
+    Lex::ParserType<ExpNodePtr>::Result ParserFunCall(const Lex::ParserStream& inp)
+    {
+        CONS(ExpNodePtr, Lex::idParser, id)
+        CONS(ExpNodePtr, TOKEN("("), _)
+        CONS(ExpNodePtr, ParserExpList, es)
+        CONS(ExpNodePtr, TOKEN(")"), _)
+        RET(ExpNodePtr(new FunCall(inp.lineNum(),id,es)));
+        EndCONS;
+        EndCONS;
+        EndCONS;
+        EndCONS(inp);
+    }
+#define ContinueWithSt(e1,ret) CONS(StatementNodePtr,e1,ret)
+    //function-stmt -> identifier (idlist) stmt-seq [return exp] end
+    Lex::ParserType<StatementNodePtr>::Result ParserFunStatement(const Lex::ParserStream& inp)
+    {
+        ContinueWithSt(Lex::idParser, fname)
+        ContinueWithSt(ParserIdList, params)
+        ContinueWithSt(ParserStatementSeq, stmtSeq)
+        ContinueWithSt(Lex::Option<ExpNodePtr>(ParserExp), retExp)
+        ContinueWithSt(TOKEN("end"), _)
+        RET(StatementNodePtr(new FunStatment(stmtSeq->LineNo(),fname,params,stmtSeq,retExp) ));
+        EndCONS;
+        EndCONS;
+        EndCONS;
+        EndCONS;
+        EndCONS(inp);
+    }
     
+
+
     /*
      if exp then stmt-seq {else stmt-sequence} end
      */
-#define TOKEN(t) Lex::Token<std::string>(Lex::strParser(t))
-
-#define ContinueWithSt(e1,ret) CONS(StatementNodePtr,e1,ret)
-
     Lex::ParserType<StatementNodePtr>::Result ParserIfStatment(const Lex::ParserStream& inp)
     {
         auto elsePart  = CONSF(StatementSeqPtr,TOKEN("else") , _) return ParserStatementSeq; EndCONS;
-        auto optionElse = CHOICE(elsePart, RETF(StatementSeqPtr(nullptr))) ;
+        auto optionElse = Lex::Option<StatementSeqPtr>(elsePart) ;
         ContinueWithSt(TOKEN("if"),_)
         ContinueWithSt(ParserExp,exp)
         ContinueWithSt(TOKEN("then"),_)
@@ -83,7 +148,7 @@ namespace Parser
     
     Lex::ParserType<StatementNodePtr>::Result ParserStatement(const Lex::ParserStream& inp)
     {
-        return Lex::ChooseN<StatementNodePtr>({ParserRead,ParserWrite,ParserAssignment,ParserIfStatment,ParserRepeatStatement})(inp);
+        return Lex::ChooseN<StatementNodePtr>({ParserRead,ParserWrite,ParserAssignment,ParserIfStatment,ParserRepeatStatement,ParserFunStatement})(inp);
     }
     
     Lex::ParserType<StatementNodePtr>::Result ParserAssignment(const Lex::ParserStream& inp)
@@ -146,7 +211,7 @@ namespace Parser
         EndCONS;
         EndCONS;
         EndCONS;
-        return Lex::ChooseN<ExpNodePtr>({ParserConst,ParserIdentifier,fexp}) (inp);
+        return Lex::ChooseN<ExpNodePtr>({ParserFunCall, ParserConst,ParserIdentifier,fexp}) (inp);
     }
     
     Lex::ParserType<ExpNodePtr>::Result _ParserUnary(const Lex::ParserStream& inp,const std::list<char>& ops,const Lex::ParserType<ExpNodePtr>::Parser& parser)

@@ -65,13 +65,14 @@ namespace Lex {
         typedef std::shared_ptr<LexResult<T>> Result;
         typedef std::function<Result(const ParserStream&)> Parser;
         typedef T ElemntT;
-        static Parser ret(T t)
+        static Parser ret(const T& t)
         {
             return [t](const ParserStream& inp)->Result
             {
                 return LexResult<T>::Some(t,inp);
             };
         }
+        
         static Parser failure()
         {
             return [](const ParserStream& inp)->Result
@@ -156,7 +157,12 @@ namespace Lex {
             }
         };
     }
-#define CHOICE(x,y) Lex::Choice<decltype(x(Lex::ParserStream()))::element_type::LexType>(x,y)
+    template<typename T>
+    inline typename ParserType<T>::Parser Option(const typename ParserType<T>::Parser& x)
+    {
+        return Choice<T>(x, ParserType<T>::ret(T()));
+    }
+    
     //regular expression +
     template<typename T>
     typename ParserType<std::list<T>>::Parser Many1(const typename ParserType<T>::Parser& f);
@@ -165,7 +171,7 @@ namespace Lex {
     template<typename T>
     inline typename ParserType<std::list<T>>::Parser Many(const typename ParserType<T>::Parser& f)
     {
-        return Choice<std::list<T>>(Many1<T>(f), ParserType<std::list<T>>::ret(std::list<T>()));
+        return Option<std::list<T>>(Many1<T>(f));
     }
     
     template<typename T>
@@ -206,5 +212,7 @@ namespace Lex {
     ParserType<char>::Result item(const ParserStream& inp);
     ParserType<std::string>::Result digitsParser(const ParserStream& inp);
     ParserType<std::string>::Result idParser(const ParserStream& inp);
+    
+    #define TOKEN(t) Lex::Token<std::string>(Lex::strParser(t))
 }
 #endif /* defined(__Compiler__Lex__) */
