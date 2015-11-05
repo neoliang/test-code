@@ -84,7 +84,7 @@ namespace Lex {
     //same as regular expression cocatnation but more powerfull
     
     template<typename T1,typename T2>
-    inline typename ParserType<T2>::Parser Bind(typename ParserType<T1>::Parser x,std::function<typename ParserType<T2>::Parser(const T1&)> y)
+    inline typename ParserType<T2>::Parser Bind(const typename ParserType<T1>::Parser& x,const std::function<typename ParserType<T2>::Parser(const T1&)>& y)
     {
         return [x,y](const ParserStream& inp)->typename ParserType<T2>::Result{
             auto r = x(inp);
@@ -98,6 +98,24 @@ namespace Lex {
             
         };
     }
+    
+//    template<typename T1,typename T2>
+//    inline auto _Bind(T1 x,T2 y)->decltype(y(x))
+//    {
+//        typedef typename decltype(x(ParserStream()))::element_type::LexType T11;
+//        typedef typename decltype((y(T11()))(ParserStream()))::element_type::LexType T3;
+//        return [x,y](const ParserStream& inp)->typename ParserType<T3>::Result{
+//            auto r = x(inp);
+//            if (r->isNone()) {
+//                return LexResult<T2>::None();
+//            }
+//            else
+//            {
+//                return (y(r->value()))(r->remain());
+//            }
+//            
+//        };
+//    }
 #define CONS(ct,e1,r) return Lex::Bind<decltype(e1(Lex::ParserStream()))::element_type::LexType,ct>(e1, [&](const decltype(e1(Lex::ParserStream()))::element_type::LexType& r )->typename Lex::ParserType<ct>::Parser{
 
 #define CONSF(ct,e1,r) Lex::Bind<decltype(e1(Lex::ParserStream()))::element_type::LexType,ct>(e1, [&](const decltype(e1(Lex::ParserStream()))::element_type::LexType& r )->typename Lex::ParserType<ct>::Parser{
@@ -120,9 +138,12 @@ namespace Lex {
             return LexResult<T>::None();
         };
     }
+#define CHOOSEN(xs) Lex::ChooseN<decltype(xs)::value_type::ElemntT>(xs)
+    
+    
     //regular expression Choice
     template<typename T>
-    inline typename ParserType<T>::Parser Choice(typename ParserType<T>::Parser x,typename ParserType<T>::Parser y)
+    inline typename ParserType<T>::Parser Choice(const typename ParserType<T>::Parser& x,const typename ParserType<T>::Parser& y)
     {
         return [x,y](const ParserStream& inp)->typename ParserType<T>::Result{
             auto r = x(inp);
@@ -138,17 +159,17 @@ namespace Lex {
 #define CHOICE(x,y) Lex::Choice<decltype(x(Lex::ParserStream()))::element_type::LexType>(x,y)
     //regular expression +
     template<typename T>
-    typename ParserType<std::list<T>>::Parser Many1(typename ParserType<T>::Parser f);
+    typename ParserType<std::list<T>>::Parser Many1(const typename ParserType<T>::Parser& f);
     
     //regular expression *
     template<typename T>
-    inline typename ParserType<std::list<T>>::Parser Many(typename ParserType<T>::Parser f)
+    inline typename ParserType<std::list<T>>::Parser Many(const typename ParserType<T>::Parser& f)
     {
         return Choice<std::list<T>>(Many1<T>(f), ParserType<std::list<T>>::ret(std::list<T>()));
     }
     
     template<typename T>
-    inline typename ParserType<std::list<T>>::Parser Many1(typename ParserType<T>::Parser f)
+    inline typename ParserType<std::list<T>>::Parser Many1(const typename ParserType<T>::Parser& f)
     {
         return Bind<T, std::list<T>>(f,[f](T v){
             return Bind<std::list<T>, std::list<T>>(Many<T>(f), [v](std::list<T> vs)
@@ -163,7 +184,7 @@ namespace Lex {
     ParserType<std::list<char>>::Result whiteParser(const ParserStream& inp);
     
     template<typename T>
-    inline typename ParserType<T>::Parser Token(typename ParserType<T>::Parser f)
+    inline typename ParserType<T>::Parser Token(const typename ParserType<T>::Parser& f)
     {
         auto preWhite = Bind<std::list<char>, T>(whiteParser, [f](const std::list<char>&)->typename ParserType<T>::Parser{
             return f;

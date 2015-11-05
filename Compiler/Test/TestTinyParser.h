@@ -71,7 +71,21 @@ inline void TestTinyParser()
         RC_ASSERT(std::dynamic_pointer_cast<Parser::ConstExp>(leftExp->GetRightExp())->GetNumber() == number2 );
         RC_ASSERT(std::dynamic_pointer_cast<Parser::ConstExp>(uexp->GetRightExp())->GetNumber() == number1);
     });
-    
+    rc::check("number+number+number",[](const int& n,const int & n1,const int& n2){
+        int number2 = abs(n2);
+        int number = abs(n);
+        int number1 = abs(n1);
+        auto str = toString(number) + "+" + toString(number2)  + "+" + toString(number1);
+        auto stream = Lex::ParserStream::fromString(str);
+        auto exp = Parser::Exp(stream);
+        auto uexp = std::dynamic_pointer_cast<Parser::UnaryOpExp>(exp);
+        RC_ASSERT(uexp != nullptr);
+        auto leftExp = std::dynamic_pointer_cast<Parser::UnaryOpExp>(uexp->GetLeftExp());
+        RC_ASSERT( leftExp != nullptr);
+        RC_ASSERT(std::dynamic_pointer_cast<Parser::ConstExp>(leftExp->GetLeftExp())->GetNumber() == number );
+        RC_ASSERT(std::dynamic_pointer_cast<Parser::ConstExp>(leftExp->GetRightExp())->GetNumber() == number2 );
+        RC_ASSERT(std::dynamic_pointer_cast<Parser::ConstExp>(uexp->GetRightExp())->GetNumber() == number1);
+    });
     rc::check("number+number*number",[](const int& n,const int & n1,const int& n2){
         int number2 = abs(n2);
         int number = abs(n);

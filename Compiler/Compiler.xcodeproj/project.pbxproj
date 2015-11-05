@@ -51,6 +51,7 @@
 		CEED21601BE36D490063A4AB /* TestTinyParser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TestTinyParser.h; sourceTree = "<group>"; };
 		CEED21611BE864A20063A4AB /* RunTime.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RunTime.cpp; sourceTree = "<group>"; };
 		CEED21621BE864A20063A4AB /* RunTime.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RunTime.h; sourceTree = "<group>"; };
+		CEED21D61BEB015E0063A4AB /* Util.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Util.h; sourceTree = "<group>"; };
 		CEF9C9001BD6516E00CC81C1 /* ParserStream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParserStream.cpp; sourceTree = "<group>"; };
 		CEF9C9011BD6516E00CC81C1 /* ParserStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParserStream.h; sourceTree = "<group>"; };
 		CEF9C9061BDE2CCC00CC81C1 /* TinySyntax.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TinySyntax.cpp; sourceTree = "<group>"; };
@@ -207,6 +208,7 @@
 		CEEB5DD71BD22E610030FDFF = {
 			isa = PBXGroup;
 			children = (
+				CEED21D61BEB015E0063A4AB /* Util.h */,
 				CEF9C9BF1BE0F0BE00CC81C1 /* librapidcheck.a */,
 				CEF9C93B1BE0F0B600CC81C1 /* include */,
 				CEF9C9351BE0B36000CC81C1 /* Test */,
@@ -653,7 +655,7 @@
 		CEF9C9321BE0B33100CC81C1 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++14";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
@@ -670,7 +672,7 @@
 		CEF9C9331BE0B33100CC81C1 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++14";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
