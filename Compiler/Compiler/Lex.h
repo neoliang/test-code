@@ -117,9 +117,9 @@ namespace Lex {
 //            
 //        };
 //    }
-#define CONS(ct,e1,r) return Lex::Bind<decltype(e1(Lex::ParserStream()))::element_type::LexType,ct>(e1, [&](const decltype(e1(Lex::ParserStream()))::element_type::LexType& r )->typename Lex::ParserType<ct>::Parser{
+#define CONS(ct,e1,r) return Lex::Bind<decltype(e1(Lex::ParserStream()))::element_type::LexType,ct>(e1, [=](const decltype(e1(Lex::ParserStream()))::element_type::LexType& r )->typename Lex::ParserType<ct>::Parser{
 
-#define CONSF(ct,e1,r) Lex::Bind<decltype(e1(Lex::ParserStream()))::element_type::LexType,ct>(e1, [&](const decltype(e1(Lex::ParserStream()))::element_type::LexType& r )->typename Lex::ParserType<ct>::Parser{
+#define CONSF(ct,e1,r) Lex::Bind<decltype(e1(Lex::ParserStream()))::element_type::LexType,ct>(e1, [=](const decltype(e1(Lex::ParserStream()))::element_type::LexType& r )->typename Lex::ParserType<ct>::Parser{
 
 
 #define EndCONS })

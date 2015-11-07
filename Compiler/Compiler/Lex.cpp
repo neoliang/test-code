@@ -85,38 +85,27 @@ namespace Lex{
     
     ParserType<std::string>::Parser charsParser(char c)
     {
-        return [c](const ParserStream& inp)->typename ParserType<std::string>::Result{
-            auto r = (charParser(c))(inp);
-            if (r->isNone()) {
-                return LexResult<std::string>::None();
-            }
-            else
-            {
-                std::string cs = "";
-                cs.push_back(r->value());
-                return LexResult<std::string>::Some(cs, r->remain());
-            }
-        };
+        CONS(std::string, charParser(c), ch)
+        std::string cs;
+        cs.push_back(ch);
+        RET(cs);
+        EndCONS;
     }
     
     ParserType<std::string>::Parser strParser(const std::string& str)
     {
         if (str.empty()) {
-            return ParserType<std::string>::ret("");
+            RET((std::string)"");
         }
         else
         {
-            auto x = str.front();
-            auto xs = str.substr(1);
-            return Bind<char, std::string>(charParser(x),
-                [str,xs](char)->typename ParserType<std::string>::Parser
-                {
-                    return Bind<std::string,std::string>(strParser(xs),
-                        [str](std::string)->typename ParserType<std::string>::Parser
-                    {
-                        return ParserType<std::string>::ret(str);
-                    });
-                });
+            auto x = charParser(str.front());
+            auto xs = strParser(str.substr(1));
+            CONS(std::string, x, _)
+            CONS(std::string, xs, _)
+            RET((std::string)str);
+            EndCONS;
+            EndCONS;
         }
     }
 }
