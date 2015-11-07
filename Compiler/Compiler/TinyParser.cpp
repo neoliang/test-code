@@ -67,12 +67,26 @@ namespace Parser
     //function-stmt -> identifier (idlist) stmt-seq [return exp] end
     Lex::ParserType<StatementNodePtr>::Result ParserFunStatement(const Lex::ParserStream& inp)
     {
+        auto optionIdList = Lex::Option<std::list<std::string>>(ParserIdList);
+        auto parserReturn = CONSF(ExpNodePtr, TOKEN("return"), _)
+        CONS(ExpNodePtr, ParserExp, retExp);
+        RET((ExpNodePtr)retExp);
+        EndCONS;
+        EndCONS;
+        auto optionRet = Lex::Option<ExpNodePtr>(parserReturn);
+        
+        ContinueWithSt(TOKEN("fun"), _)
         ContinueWithSt(Lex::idParser, fname)
-        ContinueWithSt(ParserIdList, params)
+        ContinueWithSt(TOKEN("("), _)
+        ContinueWithSt(optionIdList, params)
+        ContinueWithSt(TOKEN(")"), _)
         ContinueWithSt(ParserStatementSeq, stmtSeq)
-        ContinueWithSt(Lex::Option<ExpNodePtr>(ParserExp), retExp)
+        ContinueWithSt(optionRet, retExp)
         ContinueWithSt(TOKEN("end"), _)
         RET(StatementNodePtr(new FunStatment(stmtSeq->LineNo(),fname,params,stmtSeq,retExp) ));
+        EndCONS;
+        EndCONS;
+        EndCONS;
         EndCONS;
         EndCONS;
         EndCONS;

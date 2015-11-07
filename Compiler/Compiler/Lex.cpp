@@ -32,9 +32,19 @@ namespace Lex{
     }
     ParserType<std::string>::Result idParser(const ParserStream& inp)
     {
-        return Token<std::string>(charListToString(Many1<char>(satParser([](char c){
-            return isalpha(c);
-        }))))(inp);
+        auto firstCharParser = Lex::satParser([](char c){return isalpha(c) || c == '_';});
+        auto alnumsParser = Many<char>(Lex::satParser([](char c){return isalnum(c) ;}));
+        auto _idParser = CONSF(std::string, firstCharParser, x)
+        CONS(std::string, alnumsParser,xs )
+        std::string id ;
+        id.push_back(x);
+        for (auto iter = xs.begin(); iter != xs.end(); ++iter) {
+            id.push_back(*iter);
+        }
+        RET(id);
+        EndCONS;
+        EndCONS;
+        return Token<std::string>(_idParser)(inp);
     }
     
     ParserType<std::list<char>>::Result whiteParser(const ParserStream& inp)

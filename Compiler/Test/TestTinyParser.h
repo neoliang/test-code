@@ -198,6 +198,15 @@ inline void TestTinyParser()
     RC_ASSERT(rs->GetStmtSeq() != nullptr);
     RC_ASSERT(rs != nullptr);
     
+    
+    //simple fun
+    {
+        auto stream = Lex::ParserStream::fromString("fun test(x) x := x + 1 return x end");
+        auto r = Parser::ParserFunStatement(stream);
+        RC_ASSERT(r != nullptr);
+        auto rf = std::dynamic_pointer_cast<Parser::FunStatment>(r->value());
+        RC_ASSERT(rf != nullptr);
+    }
     //all
     {
         auto str = std::string("x := 10;\nrepeat \n\tx := x - 1;\n\tif x = 2 then\n\t\twrite x\n\telse\n\t\twrite x + 1\n\tend\nuntil x = 0; write x");
