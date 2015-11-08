@@ -10,6 +10,7 @@
 #define __Compiler__RunTime__
 
 #include <map>
+#include <iostream>
 #include "TinySyntax.h"
 
 struct Val{
@@ -28,6 +29,8 @@ struct Val{
     ,t(INT){}
     Val(const Parser::FunStatmentPtr& f)
     :fun(f),t(Fun){}
+    
+    
 };
 class Env
 {
@@ -59,25 +62,67 @@ public:
             _pre->SetVar(key, v);
         }
     }
+    Val GetVar(const std::string& key)
+    {
+        auto iter = _vars.find(key);
+        if (iter != _vars.end()) {
+            return iter->second;
+        }
+        else if (_pre != nullptr)
+        {
+            return _pre->GetVar(key);
+        }
+        throw std::bad_exception();
+    }
     
+    std::shared_ptr<Env> PreEnv()
+    {
+        return _pre;
+    }
+    ~Env()
+    {
+        std::cout << "~Env()" << std::endl;
+    }
 };
+
+typedef std::shared_ptr<Env> EnvPtr;
 class TinyRunTime
 {
-    std::map<std::string, int> _vars;
+    EnvPtr _currentEnv = nullptr;
+    
+    void PushEnv()
+    {
+        _currentEnv = EnvPtr(new Env(_currentEnv));
+    }
+    void PopEnv()
+    {
+        _currentEnv = _currentEnv->PreEnv();
+    }
     
     int EvalNumberExp(Parser::ExpNodePtr exp);
     int EvalUnary(Parser::UnaryExpPtr exp);
     int EvalConst(Parser::ConstExpPtr exp);
     int EvalID(Parser::IdExpPtr exp);
-    
+    int EvalFunCall(Parser::FunCallPtr exp);
     void ExeStatmentAssign(Parser::AssignStatementPtr stmt);
     void ExeStatmentIf(Parser::IfStatementPtr stmt);
     void ExeStatmentRepeat(Parser::RepeatStatementPtr stmt);
     void ExeStatmentWrite(Parser::WriteStatementPtr stmt);
     void ExeStatmentRead(Parser::ReadStatementPtr stmt);
+    void ExeStatmentFun(Parser::FunStatmentPtr stmt);
     void ExeStatment(Parser::StatementNodePtr stmt);
     
+    
 public:
+    
+    TinyRunTime()
+    {
+        PushEnv();
+    }
+    ~TinyRunTime()
+    {
+        PopEnv();
+    }
     void ExeStatmentSeq(Parser::StatementSeqPtr stmtSeq);
 };
 

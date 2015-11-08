@@ -161,6 +161,14 @@ namespace Parser {
         }
         
         void Visit(std::shared_ptr<NodeVisitor> vi);
+        
+        const std::list<std::string>& GetParams()const
+        {
+            return _params;
+        }
+        std::shared_ptr<StatementSeq> GetStmtSeq()const{return _stmtSeq;}
+        ExpNodePtr GetRetExp()const{return _retExp;}
+        const std::string& GetName()const{return _name;}
     };
     class IfStatement : public StatementNode
     {
@@ -256,7 +264,7 @@ namespace Parser {
     typedef std::shared_ptr<UnaryOpExp> UnaryExpPtr;
     typedef std::shared_ptr<ConstExp> ConstExpPtr;
     typedef std::shared_ptr<IdExp> IdExpPtr;
-    
+    typedef std::shared_ptr<FunCall> FunCallPtr;
     typedef std::shared_ptr<StatementNode> StatementNodePtr;
     typedef std::shared_ptr<StatementSeq> StatementSeqPtr;
     typedef std::shared_ptr<ReadStatement> ReadStatementPtr;

@@ -21,7 +21,6 @@ int main(int argc, const char * argv[]) {
     if (argc < 2) {
         return  1;
     }
-    
     FILE *fp = fopen(argv[1], "r");
     if (fp == nullptr) {
         cout << "open file error " << argv[1] << endl;
@@ -39,12 +38,10 @@ int main(int argc, const char * argv[]) {
     TinyRunTime runtime;
     if (!r->isNone()) {
         runtime.ExeStatmentSeq(r->value());
-        return 0;
     }
     else
     {
         cout << "parser error in " << r->remain().lineNum() << endl;
-        return 1;
     }
-    
+    return 0;
 }

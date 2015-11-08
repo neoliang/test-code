@@ -129,6 +129,9 @@ inline void TestTinyParser()
         int number = abs(n);
         int number1 = abs(n1);
         auto str = std::string("hello := ") + toString(number) + "+" + toString(number2) + "*" + toString(number1);
+        if (rand() % 2 == 0 ) {
+            str = "local " + str;
+        }
         auto stream = Lex::ParserStream::fromString(str);
         auto exp = Parser::ParserAssignment(stream);
         RC_ASSERT(!exp->isNone());
@@ -206,6 +209,12 @@ inline void TestTinyParser()
         RC_ASSERT(r != nullptr);
         auto rf = std::dynamic_pointer_cast<Parser::FunStatment>(r->value());
         RC_ASSERT(rf != nullptr);
+    }
+    //funcall
+    {
+        auto stream = Lex::ParserStream::fromString("x := hello() + 1");
+        auto r = Parser::ParserAssignment(stream);
+        RC_ASSERT(r->value() != nullptr);
     }
     //all
     {
