@@ -53,9 +53,10 @@ namespace Parser
     //functioncall -> identifier (explist)
     Lex::ParserType<ExpNodePtr>::Result ParserFunCall(const Lex::ParserStream& inp)
     {
+        auto optionExpList = Lex::Option<std::list<ExpNodePtr>>(ParserExpList);
         CONS(ExpNodePtr, Lex::idParser, id)
         CONS(ExpNodePtr, TOKEN("("), _)
-        CONS(ExpNodePtr, ParserExpList, es)
+        CONS(ExpNodePtr, optionExpList, es)
         CONS(ExpNodePtr, TOKEN(")"), _)
         RET(ExpNodePtr(new FunCall(inp.lineNum(),id,es)));
         EndCONS;
