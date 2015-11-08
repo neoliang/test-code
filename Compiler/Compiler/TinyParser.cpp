@@ -167,10 +167,15 @@ namespace Parser
     
     Lex::ParserType<StatementNodePtr>::Result ParserAssignment(const Lex::ParserStream& inp)
     {
+        auto localId = Lex::Token<std::string>(Lex::strParser("local"));
+        auto optionLocal = Lex::Option<std::string>(localId);
+        ContinueWithSt(optionLocal, _l)
         ContinueWithSt(Lex::idParser , id)
         ContinueWithSt(TOKEN(":="), _)
         ContinueWithSt( ParserExp, exp)
-        RET(StatementNodePtr(new AssignStatement(inp.lineNum(),id,exp)));
+        bool isLocal = _l == "local";
+        RET(StatementNodePtr(new AssignStatement(inp.lineNum(),id,exp,isLocal)));
+        EndCONS;
         EndCONS;
         EndCONS;
         EndCONS(inp);

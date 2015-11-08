@@ -11,6 +11,56 @@
 
 #include <map>
 #include "TinySyntax.h"
+
+struct Val{
+    int i = 0;
+    Parser::FunStatmentPtr fun = nullptr;
+    enum {
+        INT,
+        Fun,
+        Nil,
+    } t;
+    Val()
+    :t(Nil)
+    {}
+    Val(int v)
+    :i(v)
+    ,t(INT){}
+    Val(const Parser::FunStatmentPtr& f)
+    :fun(f),t(Fun){}
+};
+class Env
+{
+    std::map<std::string,Val> _vars;
+    std::shared_ptr<Env> _pre;
+    
+public:
+    Env(std::shared_ptr<Env> pre = nullptr)
+    :_pre(pre){
+        
+    }
+    
+    void SetLocalVar(const std::string& key,Val v)
+    {
+        _vars[key] = v;
+    }
+    void SetVar(const std::string& key,Val v)
+    {
+        if (_pre == nullptr) {
+            SetLocalVar(key, v);
+        }
+        
+        auto iter = _vars.find(key);
+        if (iter != _vars.end()) {
+            iter->second = v;
+        }
+        else
+        {
+            _pre->SetVar(key, v);
+        }
+    }
+    
+};
 class TinyRunTime
 {
     std::map<std::string, int> _vars;

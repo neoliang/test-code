@@ -204,16 +204,19 @@ namespace Parser {
     {
         std::string _identifier;
         std::shared_ptr<ExpNode> _exp;
+        bool _isLocal ;
     public:
         
-        AssignStatement(unsigned int lineno,const std::string& id,std::shared_ptr<ExpNode> exp)
+        AssignStatement(unsigned int lineno,const std::string& id,std::shared_ptr<ExpNode> exp,bool isLocal = false)
         :StatementNode(lineno)
         ,_identifier(id)
         ,_exp(exp)
+        ,_isLocal(isLocal)
         {}
         void Visit(std::shared_ptr<NodeVisitor> vi);
         std::shared_ptr<ExpNode> GetExp()const{return _exp;}
         const std::string& GetIdentifier()const{return _identifier;}
+        const bool IsLocal()const{return _isLocal;}
     };
     
     class ReadStatement : public StatementNode
@@ -261,6 +264,7 @@ namespace Parser {
     typedef std::shared_ptr<AssignStatement> AssignStatementPtr;
     typedef std::shared_ptr<IfStatement> IfStatementPtr;
     typedef std::shared_ptr<RepeatStatement> RepeatStatementPtr;
+    typedef std::shared_ptr<FunStatment> FunStatmentPtr;
 }
 
 
