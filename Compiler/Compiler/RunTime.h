@@ -40,8 +40,10 @@ class Env
 public:
     Env(std::shared_ptr<Env> pre = nullptr)
     :_pre(pre){
-        
+        //std::cout << "Env()" << std::endl;
     }
+    Env(const Env&) = delete;
+    const Env& operator = (const Env&) = delete;
     
     void SetLocalVar(const std::string& key,Val v)
     {
@@ -81,7 +83,7 @@ public:
     }
     ~Env()
     {
-        std::cout << "~Env()" << std::endl;
+        //std::cout << "~Env()" << std::endl;
     }
 };
 
