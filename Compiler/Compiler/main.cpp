@@ -12,7 +12,6 @@
 #include <sstream>
 #include "TinyParser.h"
 #include "RunTime.h"
-#include <iostream>
 
 
 using namespace std;

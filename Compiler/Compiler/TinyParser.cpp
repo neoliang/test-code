@@ -137,27 +137,18 @@ namespace Parser
     
     Lex::ParserType<StatementSeqPtr>::Result ParserStatementSeq(const Lex::ParserStream& inp)
     {
-        auto optionPart = CONSF(StatementNodePtr,Lex::Token<std::string>(Lex::charsParser(';')) , _)
-            return ParserStatement;
+        
+        auto optionPart = Lex::Option<std::string>(Lex::Token<std::string>(Lex::charsParser(';')));
+        auto statmentParser = CONSF(StatementNodePtr, ParserStatement,stmt)
+        CONS(StatementNodePtr, optionPart, _)
+        RET((StatementNodePtr)stmt);
         EndCONS;
-        auto optioPartList =  Lex::Many<StatementNodePtr>(optionPart);
-        CONS(StatementSeqPtr, ParserStatement, stmt)
-            return [optioPartList,stmt](const Lex::ParserStream& inp)->typename Lex::ParserType<StatementSeqPtr>::Result{
-                auto r = optioPartList(inp);
-                auto stmtseq = StatementSeqPtr(new StatementSeq(inp.lineNum()));
-                stmtseq->AddStatement(stmt);
-                if (r->isNone()) {
-                    return Lex::LexResult<StatementSeqPtr>::Some(stmtseq, inp);
-                }
-                else
-                {
-                    for (auto iter = r->value().begin(); iter != r->value().end(); ++iter) {
-                        stmtseq->AddStatement(*iter);
-                    }
-                    return Lex::LexResult<StatementSeqPtr>::Some(stmtseq, r->remain());
-                }
-            };
-            
+        EndCONS;
+        auto statmentsParser =  Lex::Many<StatementNodePtr>(statmentParser);
+        CONS(StatementSeqPtr, statmentsParser, statementsList)
+        auto slist = std::vector<StatementNodePtr>(statementsList.begin(),statementsList.end());
+        auto seq = StatementSeqPtr(new StatementSeq(inp.lineNum(),slist));
+        RET(seq);
         EndCONS(inp);
     }
     
