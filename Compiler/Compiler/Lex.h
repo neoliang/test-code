@@ -192,16 +192,10 @@ namespace Lex {
     template<typename T>
     inline typename ParserType<T>::Parser Token(const typename ParserType<T>::Parser& f)
     {
-        auto preWhite = Bind<std::list<char>, T>(whiteParser, [f](const std::list<char>&)->typename ParserType<T>::Parser{
+        return Bind<std::list<char>, T>(whiteParser, [f](const std::list<char>&)->typename ParserType<T>::Parser{
             return f;
         });
-        auto postWhite = Bind<T, T>(preWhite,[f](const T& p)->typename ParserType<T>::Parser{
-            return [p](const Lex::ParserStream& inp)->typename ParserType<T>::Result{
-                auto _post = whiteParser(inp);
-                return Lex::LexResult<T>::Some(p,_post->remain());
-            };
-        });
-        return postWhite;
+
     }
     
     ParserType<std::string>::Parser charListToString(const ParserType<std::list<char>>::Parser&);

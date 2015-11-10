@@ -227,7 +227,7 @@ namespace Parser
     
     Lex::ParserType<ExpNodePtr>::Parser _ParserUnary(const std::list<char>& ops,const Lex::ParserType<ExpNodePtr>::Parser& parser)
     {
-        auto mulOpParser = Lex::satParser([&](char c)->bool{
+        auto _mulOpParser = Lex::satParser([&](char c)->bool{
             for (auto iter = ops.begin(); iter != ops.end(); ++iter) {
                 if (*iter == c) {
                     return true;
@@ -235,6 +235,7 @@ namespace Parser
             }
             return false;
         });
+        auto mulOpParser = Lex::Token<char>(_mulOpParser);
         
         typedef std::pair<char, ExpNodePtr> opExpT;
         auto bMulOpExp = CONSF(opExpT, mulOpParser, op)

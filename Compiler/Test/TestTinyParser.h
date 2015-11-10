@@ -149,7 +149,7 @@ inline void TestTinyParser()
     rc::check("if number < number then word:= 123 end",[](const int& n,const int & n1){
         int number = abs(n);
         int number1 = abs(n1);
-        auto str = std::string("if ") + toString(number) + " < " + toString(number1) + " then \n word:= 1\n end";
+        auto str = std::string("if ") + toString(number) + " < " + toString(number1) + " then \n word := 1\n end";
         auto stream = Lex::ParserStream::fromString(str);
         auto exp = Parser::ParserIfStatment(stream);
         RC_ASSERT(!exp->isNone());
