@@ -14,15 +14,23 @@
 #include "TinySyntax.h"
 
 struct Val{
-    int i = 0;
+    union{
+        int i = 0;
+        bool b ;
+    };
     Parser::FunStatmentPtr fun = nullptr;
     enum {
         INT,
         Fun,
+        BOOL,
         Nil,
     } t;
     Val()
     :t(Nil)
+    {}
+    Val(bool v)
+    :b(v)
+    ,t(BOOL)
     {}
     Val(int v)
     :i(v)
@@ -90,6 +98,13 @@ public:
 typedef std::shared_ptr<Env> EnvPtr;
 class TinyRunTime
 {
+public:
+    enum ReturnState{
+        Return_normal,
+        Return_Early,
+        Return_break,
+    };
+private:
     EnvPtr _currentEnv = nullptr;
     
     void PushEnv()
@@ -101,22 +116,24 @@ class TinyRunTime
         _currentEnv = _currentEnv->PreEnv();
     }
     
-    int EvalNumberExp(Parser::ExpNodePtr exp);
-    int EvalUnary(Parser::UnaryExpPtr exp);
-    int EvalConst(Parser::ConstExpPtr exp);
-    int EvalID(Parser::IdExpPtr exp);
-    int EvalFunCall(Parser::FunCallPtr exp);
-    void ExeStatmentAssign(Parser::AssignStatementPtr stmt);
-    void ExeStatmentIf(Parser::IfStatementPtr stmt);
-    void ExeStatmentRepeat(Parser::RepeatStatementPtr stmt);
-    void ExeStatmentWrite(Parser::WriteStatementPtr stmt);
-    void ExeStatmentRead(Parser::ReadStatementPtr stmt);
-    void ExeStatmentFun(Parser::FunStatmentPtr stmt);
-    void ExeStatment(Parser::StatementNodePtr stmt);
+    Val EvalExp(Parser::ExpNodePtr exp);
+    Val EvalUnary(Parser::UnaryExpPtr exp);
+    Val EvalConst(Parser::ConstExpPtr exp);
+    Val EvalID(Parser::IdExpPtr exp);
+    Val EvalFunCall(Parser::FunCallPtr exp);
     
+    
+    std::tuple<Val,ReturnState> ExeStatmentAssign(Parser::AssignStatementPtr stmt);
+    std::tuple<Val,ReturnState> ExeStatmentIf(Parser::IfStatementPtr stmt);
+    std::tuple<Val,ReturnState> ExeStatmentRepeat(Parser::RepeatStatementPtr stmt);
+    std::tuple<Val,ReturnState> ExeStatmentWrite(Parser::WriteStatementPtr stmt);
+    std::tuple<Val,ReturnState> ExeStatmentRead(Parser::ReadStatementPtr stmt);
+    std::tuple<Val,ReturnState> ExeStatmentFun(Parser::FunStatmentPtr stmt);
+    std::tuple<Val,ReturnState> ExeStatment(Parser::StatementNodePtr stmt);
+    std::tuple<Val,ReturnState> ExeStatmentReturn(Parser::ReturnStatementPtr stmt);
     
 public:
-    
+
     TinyRunTime()
     {
         PushEnv();
@@ -125,7 +142,7 @@ public:
     {
         PopEnv();
     }
-    void ExeStatmentSeq(Parser::StatementSeqPtr stmtSeq);
+    std::tuple<Val,TinyRunTime::ReturnState> ExeStatmentSeq(Parser::StatementSeqPtr stmtSeq);
 };
 
 #endif /* defined(__Compiler__RunTime__) */

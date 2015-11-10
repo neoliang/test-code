@@ -13,9 +13,15 @@
 #include "TinyParser.h"
 #include "RunTime.h"
 
-
-
 using namespace std;
+
+class X{
+public:
+    X()
+    {
+        std::cout << "X()" << std::endl;
+    }
+};
 int main(int argc, const char * argv[]) {
     
     if (argc < 2) {

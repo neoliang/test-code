@@ -140,22 +140,40 @@ namespace Parser {
             std::for_each(_statements.begin(), _statements.end(), v);
         }
         void Visit(std::shared_ptr<NodeVisitor> vi);
+        
+        const auto& getStatments()
+        {
+            return _statements;
+        }
     };
-    //function-stmt -> identifier (idlist) stmt-seq [return exp] end
-    class FunStatment : public StatementNode
+    
+    class ReturnStatement: public StatementNode
     {
         ExpNodePtr _retExp;
+        
+    public:
+        
+        ReturnStatement(unsigned int lineno,ExpNodePtr exp)
+        :StatementNode(lineno)
+        ,_retExp(exp){}
+        ExpNodePtr GetRetExp()const{return _retExp;}
+        void Visit(std::shared_ptr<NodeVisitor> vi){}
+    };
+    typedef std::shared_ptr<ReturnStatement> ReturnStatementPtr;
+    
+    //function-stmt -> identifier (idlist) stmt-seq end
+    class FunStatment : public StatementNode
+    {
         std::shared_ptr<StatementSeq> _stmtSeq;
         std::list<std::string> _params;
         std::string _name;
         
     public:
-        FunStatment(unsigned int lineno, const std::string& name,const std::list<std::string>& params, std::shared_ptr<StatementSeq> stmtSeq,ExpNodePtr exp = nullptr)
+        FunStatment(unsigned int lineno, const std::string& name,const std::list<std::string>& params, std::shared_ptr<StatementSeq> stmtSeq)
         :StatementNode(lineno)
         ,_name(name)
         ,_params(params)
         ,_stmtSeq(stmtSeq)
-        ,_retExp(exp)
         {
             
         }
@@ -167,7 +185,6 @@ namespace Parser {
             return _params;
         }
         std::shared_ptr<StatementSeq> GetStmtSeq()const{return _stmtSeq;}
-        ExpNodePtr GetRetExp()const{return _retExp;}
         const std::string& GetName()const{return _name;}
     };
     class IfStatement : public StatementNode
@@ -190,6 +207,7 @@ namespace Parser {
         void Visit(std::shared_ptr<NodeVisitor> vi);
         
     };
+    
     
     class RepeatStatement : public StatementNode
     {
